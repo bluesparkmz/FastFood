@@ -12,7 +12,7 @@ import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import fastfoodApi from '@/api/fastfoodApi';
 import type { Restaurant, FastFoodOrder, RestaurantTable, Tab, CatalogProduct } from '@/types/fastfood';
 import toast from 'react-hot-toast';
-import { getImageUrl, getMultipleImageUrls } from '@/utils/imageUtils';
+import { getImageUrl, getMultipleImageUrls, isEmoji } from '@/utils/imageUtils';
 import { cn } from '@/lib/utils';
 
 export default function RestaurantDetailPage() {
