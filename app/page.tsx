@@ -7,7 +7,6 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import RestaurantCard from '@/components/fastfood/RestaurantCard';
 import FoodFeedCard from '@/components/fastfood/FoodFeedCard';
-import BottomNav from '@/components/fastfood/BottomNav';
 import fastfoodApi from '@/api/fastfoodApi';
 import type { Restaurant, CatalogProduct } from '@/types/fastfood';
 import toast from 'react-hot-toast';
@@ -348,7 +347,6 @@ export default function FastFoodPage() {
         )}
       </AnimatePresence>
 
-      <BottomNav />
     </div>
   );
 }

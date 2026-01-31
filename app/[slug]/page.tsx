@@ -13,7 +13,7 @@ import type { Restaurant, FastFoodOrder, RestaurantTable, Tab, CatalogProduct } 
 import toast from 'react-hot-toast';
 import { getImageUrl, getMultipleImageUrls } from '@/utils/imageUtils';
 import { cn } from '@/lib/utils';
-import BottomNav from '@/components/fastfood/BottomNav';
+import fastfoodApi from '@/api/fastfoodApi';
 
 export default function RestaurantDetailPage() {
   const params = useParams();
@@ -721,7 +721,6 @@ export default function RestaurantDetailPage() {
         </div>
       )}
 
-      <BottomNav />
     </div>
   );
 }
