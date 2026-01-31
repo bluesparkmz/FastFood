@@ -136,7 +136,7 @@ export default function FastFoodPage() {
                 >
                   <div className="relative aspect-[16/10] rounded-2xl overflow-hidden mb-3 bg-gray-100">
                     <img
-                      src={res.cover_image || '/images/restaurant-placeholder.jpg'}
+                      src={getImageUrl(res.cover_image) || '/images/restaurant-placeholder.jpg'}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-2 py-1 rounded-lg flex items-center gap-1 shadow-sm">
@@ -175,7 +175,7 @@ export default function FastFoodPage() {
                 >
                   <div className="relative aspect-video rounded-2xl overflow-hidden mb-3 bg-gray-100">
                     <img
-                      src={res.cover_image || '/images/restaurant-placeholder.jpg'}
+                      src={getImageUrl(res.cover_image) || '/images/restaurant-placeholder.jpg'}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                     <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-md px-2 py-1 rounded-lg text-[10px] font-black text-gray-900">
