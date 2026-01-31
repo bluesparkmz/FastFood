@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { ShoppingCart, Star, Clock } from 'lucide-react';
 import { MenuItem } from '@/types/fastfood';
 import { motion } from 'framer-motion';
+import { getImageUrl, isEmoji } from '@/utils/imageUtils';
 
 interface FoodFeedCardProps {
     item: MenuItem;
@@ -22,16 +23,16 @@ export default function FoodFeedCard({ item, restaurantName, onClick }: FoodFeed
             className="bg-white rounded-[2.5rem] overflow-hidden shadow-soft border border-gray-100 group flex flex-col h-full"
         >
             <div className="relative aspect-[4/3] overflow-hidden bg-gray-50">
-                {item.image ? (
+                {item.image && !isEmoji(item.image) ? (
                     <Image
-                        src={item.image}
+                        src={getImageUrl(item.image)}
                         alt={item.name}
                         fill
                         className="object-cover group-hover:scale-110 transition-transform duration-700"
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center text-6xl">
-                        {item.emoji || '🍔'}
+                        {isEmoji(item.image) ? item.image : (item.emoji || '🍔')}
                     </div>
                 )}
                 <div className="absolute top-4 left-4">

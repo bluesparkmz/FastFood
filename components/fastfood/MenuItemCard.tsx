@@ -4,7 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import { Plus, Minus } from 'lucide-react';
 import type { MenuItem } from '@/types/fastfood';
-import { getImageUrl } from '@/utils/imageUtils';
+import { getImageUrl, isEmoji } from '@/utils/imageUtils';
 
 interface MenuItemCardProps {
   item: MenuItem;
@@ -25,18 +25,24 @@ export default function MenuItemCard({
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
       <div className="flex gap-3 p-3">
-        {/* Image */}
-        <div className="relative w-20 h-20 flex-shrink-0 rounded-md overflow-hidden bg-gray-100">
-          <Image
-            src={imageUrl}
-            alt={item.name}
-            fill
-            className="object-cover"
-            onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-              const target = e.target as HTMLImageElement;
-              target.src = defaultImage;
-            }}
-          />
+        {/* Image / Emoji */}
+        <div className="relative w-20 h-20 flex-shrink-0 rounded-md overflow-hidden bg-gray-50">
+          {item.image && !isEmoji(item.image) ? (
+            <Image
+              src={getImageUrl(item.image) || defaultImage}
+              alt={item.name}
+              fill
+              className="object-cover"
+              onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                const target = e.target as HTMLImageElement;
+                target.src = defaultImage;
+              }}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-3xl bg-gray-50">
+              {isEmoji(item.image) ? item.image : (item.emoji || '🍔')}
+            </div>
+          )}
           {item.is_available === false && (
             <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center">
               <span className="text-white text-xs font-semibold">Indisponível</span>
@@ -79,8 +85,8 @@ export default function MenuItemCard({
                 <button
                   onClick={onAdd}
                   className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors ${item.is_available === false
-                      ? 'bg-gray-200 cursor-not-allowed'
-                      : 'bg-orange-500 hover:bg-orange-600'
+                    ? 'bg-gray-200 cursor-not-allowed'
+                    : 'bg-orange-500 hover:bg-orange-600'
                     }`}
                   disabled={item.is_available === false}
                 >

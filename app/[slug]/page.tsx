@@ -674,7 +674,10 @@ export default function RestaurantDetailPage() {
 
 // Sub-component: Premium Product Card (List Style)
 const ProductCard = ({ item, type, quantity, onAdd, onRemove, isDrink }: any) => {
-  const imageUrl = item.image ? getImageUrl(item.image) : (item.photo ? getImageUrl(item.photo) : null);
+  const isEmojiImage = item.image && isEmoji(item.image);
+  const isEmojiPhoto = item.photo && isEmoji(item.photo);
+  const displayEmoji = isEmojiImage ? item.image : (isEmojiPhoto ? item.photo : (item.emoji || (isDrink ? '🥤' : '🍔')));
+  const imageUrl = (!isEmojiImage && item.image) ? getImageUrl(item.image) : ((!isEmojiPhoto && item.photo) ? getImageUrl(item.photo) : null);
 
   return (
     <motion.div
@@ -690,7 +693,7 @@ const ProductCard = ({ item, type, quantity, onAdd, onRemove, isDrink }: any) =>
           <img src={imageUrl} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gray-50 text-3xl">
-            {item.emoji || (isDrink ? '🥤' : '🍔')}
+            {displayEmoji}
           </div>
         )}
 
