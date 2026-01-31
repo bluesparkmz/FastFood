@@ -7,10 +7,12 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import RestaurantCard from '@/components/fastfood/RestaurantCard';
 import FoodFeedCard from '@/components/fastfood/FoodFeedCard';
+import BottomNav from '@/components/fastfood/BottomNav';
 import fastfoodApi from '@/api/fastfoodApi';
 import type { Restaurant, CatalogProduct } from '@/types/fastfood';
 import toast from 'react-hot-toast';
 import { cn } from '@/lib/utils';
+import { Star, ShieldCheck } from 'lucide-react';
 
 
 const FOOD_CATEGORIES = [
@@ -219,7 +221,46 @@ export default function FastFoodPage() {
           </section>
         )}
 
-        {/* Popular Restaurants Section */}
+        {/* Popular / Suggested Restaurants Section */}
+        {!searchQuery && !selectedCategory && restaurants.length > 0 && (
+          <section className="mb-12">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-black text-gray-900 flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-orange-500" />
+                Sugeridos para Si
+              </h3>
+            </div>
+            <div className="flex gap-4 overflow-x-auto hide-scrollbar -mx-4 px-4 pb-4">
+              {restaurants.map((res: Restaurant) => (
+                <Link
+                  key={`sug-res-${res.id}`}
+                  href={`/${res.slug}`}
+                  className="flex-shrink-0 w-72 bg-white rounded-[2rem] p-3 border border-gray-100 shadow-sm hover:shadow-md transition-all group"
+                >
+                  <div className="relative aspect-[16/10] rounded-2xl overflow-hidden mb-3 bg-gray-100">
+                    <img
+                      src={res.cover_image || '/images/restaurant-placeholder.jpg'}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-2 py-1 rounded-lg flex items-center gap-1 shadow-sm">
+                      <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                      <span className="text-[10px] font-black text-gray-900">{(Number(res.rating) || 0).toFixed(1)}</span>
+                    </div>
+                  </div>
+                  <div className="px-1">
+                    <h4 className="font-black text-gray-900 truncate text-base">{res.name}</h4>
+                    <div className="flex items-center justify-between mt-1">
+                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{res.category || 'Restaurante'}</p>
+                      <p className="text-[10px] font-black text-orange-600">{(Number(res.min_delivery_value) || 0).toFixed(0)} MT mín.</p>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Popular Restaurants Section (Alternative view or hidden if using suggested row) */}
         {!searchQuery && !selectedCategory && exploreData?.new_restaurants?.length > 0 && (
           <section className="mb-12">
             <div className="flex items-center justify-between mb-6">
@@ -235,7 +276,7 @@ export default function FastFoodPage() {
                   href={`/${res.slug}`}
                   className="flex-shrink-0 w-64 bg-white rounded-3xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-all group"
                 >
-                  <div className="relative aspect-video rounded-2xl overflow-hidden mb-3">
+                  <div className="relative aspect-video rounded-2xl overflow-hidden mb-3 bg-gray-100">
                     <img
                       src={res.cover_image || '/images/restaurant-placeholder.jpg'}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
@@ -252,49 +293,51 @@ export default function FastFoodPage() {
           </section>
         )}
 
-        {/* Restaurants Section */}
-        <section>
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-black text-gray-900 flex items-center gap-2">
-              <UtensilsCrossed className="w-5 h-5 text-orange-500" />
-              {searchQuery ? 'Restaurantes Encontrados' : (selectedCategory ? `Restaurantes: ${selectedCategory}` : 'Restaurantes Populares')}
-            </h3>
-            {restaurants.length > 0 && (
-              <span className="px-3 py-1 rounded-full bg-gray-100 text-[10px] font-black text-gray-500 uppercase tracking-widest">
-                {restaurants.length} Lugares
-              </span>
-            )}
-          </div>
+        {/* Restaurants Section (Visible during search/category filter) */}
+        {(searchQuery || selectedCategory) && (
+          <section>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-black text-gray-900 flex items-center gap-2">
+                <UtensilsCrossed className="w-5 h-5 text-orange-500" />
+                {searchQuery ? 'Restaurantes Encontrados' : `Restaurantes: ${selectedCategory}`}
+              </h3>
+              {restaurants.length > 0 && (
+                <span className="px-3 py-1 rounded-full bg-gray-100 text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                  {restaurants.length} Lugares
+                </span>
+              )}
+            </div>
 
-          {loading ? (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="bg-white rounded-[1.5rem] shadow-sm h-48 animate-pulse p-4 flex gap-4">
-                  <div className="w-48 bg-gray-100 rounded-xl"></div>
-                  <div className="flex-1 space-y-3">
-                    <div className="h-4 bg-gray-100 rounded w-3/4"></div>
-                    <div className="h-3 bg-gray-100 rounded w-1/2"></div>
-                    <div className="h-3 bg-gray-100 rounded w-1/4"></div>
+            {loading ? (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="bg-white rounded-[1.5rem] shadow-sm h-48 animate-pulse p-4 flex gap-4">
+                    <div className="w-48 bg-gray-100 rounded-xl"></div>
+                    <div className="flex-1 space-y-3">
+                      <div className="h-4 bg-gray-100 rounded w-3/4"></div>
+                      <div className="h-3 bg-gray-100 rounded w-1/2"></div>
+                      <div className="h-3 bg-gray-100 rounded w-1/4"></div>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          ) : restaurants.length === 0 ? (
-            <div className="text-center py-20 bg-white rounded-[3rem] border-2 border-dashed border-gray-100">
-              <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Utensils className="w-10 h-10 text-gray-300" />
+                ))}
               </div>
-              <h4 className="text-lg font-black text-gray-900 mb-2">Sem resultados</h4>
-              <p className="text-gray-400 text-sm font-medium">Não encontramos o que procura. Tente outra pesquisa.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl">
-              {restaurants.map((restaurant) => (
-                <RestaurantCard key={restaurant.id} restaurant={restaurant} />
-              ))}
-            </div>
-          )}
-        </section>
+            ) : restaurants.length === 0 ? (
+              <div className="text-center py-20 bg-white rounded-[3rem] border-2 border-dashed border-gray-100">
+                <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Utensils className="w-10 h-10 text-gray-300" />
+                </div>
+                <h4 className="text-lg font-black text-gray-900 mb-2">Sem resultados</h4>
+                <p className="text-gray-400 text-sm font-medium">Não encontramos o que procura. Tente outra pesquisa.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl">
+                {restaurants.map((restaurant) => (
+                  <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+                ))}
+              </div>
+            )}
+          </section>
+        )}
       </main>
 
       {/* Mobile Floating Action Button - Create Restaurant (Removed as requested) */}
@@ -362,6 +405,8 @@ export default function FastFoodPage() {
           </>
         )}
       </AnimatePresence>
+
+      <BottomNav />
     </div>
   );
 }
