@@ -12,6 +12,7 @@ import type { Restaurant, CatalogProduct } from '@/types/fastfood';
 import toast from 'react-hot-toast';
 import { cn } from '@/lib/utils';
 
+
 const FOOD_CATEGORIES = [
   { name: 'Tudo', icon: '🍽️', slug: '' },
   { name: 'Pizza', icon: '🍕', slug: 'Pizza' },
