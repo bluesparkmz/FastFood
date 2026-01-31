@@ -7,6 +7,7 @@ import {
   Navigation, ChevronLeft, ChevronRight, CheckCircle,
   XCircle, Search, Plus, Minus, Info
 } from 'lucide-react';
+import Image from 'next/image';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import fastfoodApi from '@/api/fastfoodApi';
 import type { Restaurant, FastFoodOrder, RestaurantTable, Tab, CatalogProduct } from '@/types/fastfood';

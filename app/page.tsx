@@ -15,6 +15,7 @@ import toast from 'react-hot-toast';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import PromoBanner from '@/components/fastfood/PromoBanner';
+import { getImageUrl } from '@/utils/imageUtils';
 
 const FOOD_CATEGORIES = [
   { name: 'Tudo', icon: '🍽️', slug: '' },
