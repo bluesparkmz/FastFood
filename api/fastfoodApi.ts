@@ -187,6 +187,19 @@ export const fastfoodApi = {
   async getTabOrders(restaurantId: number, tabId: number): Promise<FastFoodOrder[]> {
     const response = await api.get(`/fastfood/restaurants/${restaurantId}/tabs/${tabId}/orders`);
     return response.data;
+  },
+
+  // ========== Explorer & Search ==========
+  async searchAll(query: string): Promise<{ restaurants: Restaurant[], products: any[] }> {
+    const response = await api.get('/fastfood/search/all', {
+      params: { q: query }
+    });
+    return response.data;
+  },
+
+  async getExploreFeed(): Promise<{ featured_products: any[], popular_restaurants: Restaurant[], new_restaurants: Restaurant[] }> {
+    const response = await api.get('/fastfood/explore');
+    return response.data;
   }
 };
 
