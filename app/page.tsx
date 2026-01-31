@@ -102,12 +102,8 @@ export default function FastFoodPage() {
           </div>
           <div>
             <h1 className={cn("text-lg font-black tracking-tight transition-colors", isScrolled ? "text-gray-900" : "text-gray-900")}>
-              SkyVenda <span className="text-orange-600 font-extrabold uppercase text-sm">Food</span>
+              Fast<span className="text-orange-600">Food</span>
             </h1>
-            <div className="flex items-center gap-1 text-[10px] font-bold text-gray-400">
-              <MapPin className="w-3 h-3 text-orange-500" />
-              <span>Maputo, MZ</span>
-            </div>
           </div>
         </div>
 
@@ -365,7 +361,7 @@ export default function FastFoodPage() {
                   <div className="w-10 h-10 rounded-2xl bg-orange-500 flex items-center justify-center text-white">
                     <Utensils className="w-6 h-6" />
                   </div>
-                  <span className="font-black text-xl tracking-tighter">FastMenu</span>
+                  <span className="font-black text-xl tracking-tighter">Fast<span className="text-orange-600">Food</span></span>
                 </div>
                 <button onClick={() => setShowMenu(false)} className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center">
                   <X className="w-5 h-5 text-gray-500" />
