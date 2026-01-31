@@ -741,8 +741,8 @@ const ProductCard = ({ item, type, quantity, onAdd, onRemove, isDrink }: any) =>
         {imageUrl ? (
           <img src={imageUrl} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
         ) : (
-          <div className="w-full h-full flex items-center justify-center flex-col gap-1 text-gray-200">
-            {isDrink ? <div className="w-8 h-8 rounded-full bg-gray-100" /> : <div className="w-10 h-10 rounded-xl bg-gray-100" />}
+          <div className="w-full h-full flex items-center justify-center bg-gray-50 text-3xl">
+            {item.emoji || (isDrink ? '🥤' : '🍔')}
           </div>
         )}
 

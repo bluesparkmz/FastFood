@@ -21,16 +21,19 @@ export default function FoodFeedCard({ item, restaurantName, onClick }: FoodFeed
             whileHover={{ y: -5 }}
             className="bg-white rounded-[2.5rem] overflow-hidden shadow-soft border border-gray-100 group flex flex-col h-full"
         >
-            <div className="relative aspect-[4/3] overflow-hidden">
-                <Image
-                    src={imageUrl}
-                    alt={item.name}
-                    fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-700"
-                    onError={(e: any) => {
-                        e.target.src = defaultImage;
-                    }}
-                />
+            <div className="relative aspect-[4/3] overflow-hidden bg-gray-50">
+                {item.image ? (
+                    <Image
+                        src={item.image}
+                        alt={item.name}
+                        fill
+                        className="object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                ) : (
+                    <div className="w-full h-full flex items-center justify-center text-6xl">
+                        {item.emoji || '🍔'}
+                    </div>
+                )}
                 <div className="absolute top-4 left-4">
                     <div className="bg-white/80 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-black uppercase text-gray-900 shadow-sm">
                         {restaurantName}

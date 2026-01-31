@@ -27,7 +27,9 @@ const FOOD_CATEGORIES = [
 export default function FastFoodPage() {
   const router = useRouter();
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const [featuredItems, setFeaturedItems] = useState<{ item: CatalogProduct, restaurant: Restaurant }[]>([]);
+  const [featuredItems, setFeaturedItems] = useState<any[]>([]);
+  const [exploreData, setExploreData] = useState<any>(null);
+  const [searchResults, setSearchResults] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
@@ -48,34 +50,36 @@ export default function FastFoodPage() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const params: any = {};
-      if (searchQuery) params.search = searchQuery;
-      if (selectedCategory) params.category = selectedCategory;
-      if (selectedProvince) params.province = selectedProvince;
 
-      const restaurantData = await fastfoodApi.searchRestaurants(params);
-      setRestaurants(restaurantData);
-
-      // Collect some menu items for the "Food Feed"
-      // In a real app, we might have a dedicated endpoint for featured items.
-      // Here we simulate by taking the first few items from the first restaurants.
-      const items: { item: CatalogProduct, restaurant: Restaurant }[] = [];
-      const fetchItemsPromises = restaurantData.slice(0, 5).map(async (res) => {
-        try {
-          const catalog = await fastfoodApi.getCatalog(res.id);
-          if (catalog.length > 0) {
-            catalog.slice(0, 2).forEach(item => {
-              items.push({ item, restaurant: res });
-            });
+      if (searchQuery) {
+        const results = await fastfoodApi.searchAll(searchQuery);
+        setSearchResults(results);
+        setRestaurants(results.restaurants);
+      } else if (selectedCategory || selectedProvince) {
+        const params: any = {};
+        if (selectedCategory) params.category = selectedCategory;
+        if (selectedProvince) params.province = selectedProvince;
+        const restaurantData = await fastfoodApi.searchRestaurants(params);
+        setRestaurants(restaurantData);
+        setSearchResults(null);
+      } else {
+        const explore = await fastfoodApi.getExploreFeed();
+        setExploreData(explore);
+        setFeaturedItems(explore.featured_products.map((p: any) => ({
+          item: p,
+          restaurant: {
+            id: p.restaurant_id,
+            name: p.restaurant_name,
+            slug: p.restaurant_slug,
+            cover_image: p.restaurant_cover_image
           }
-        } catch (e) { }
-      });
-      await Promise.all(fetchItemsPromises);
-      setFeaturedItems(items);
-
+        })));
+        setRestaurants(explore.popular_restaurants);
+        setSearchResults(null);
+      }
     } catch (error: any) {
       console.error('Error fetching data:', error);
-      toast.error(error.userMessage || 'Erro ao carregar dados');
+      toast.error('Erro ao carregar dados');
     } finally {
       setLoading(false);
     }
@@ -169,21 +173,41 @@ export default function FastFoodPage() {
       {/* Main Content Area */}
       <main className="max-w-7xl mx-auto px-4 py-8">
 
+        {/* Search Results - Products */}
+        {searchQuery && searchResults?.products?.length > 0 && (
+          <section className="mb-12">
+            <h3 className="text-xl font-black text-gray-900 mb-6 flex items-center gap-2">
+              <ShoppingBag className="w-5 h-5 text-orange-500" />
+              Produtos Encontrados
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {searchResults.products.map((p: any) => (
+                <FoodFeedCard
+                  key={`search-prod-${p.id}`}
+                  item={p}
+                  restaurantName={p.restaurant_name}
+                  onClick={() => router.push(`/${p.restaurant_slug}#item-${p.id}`)}
+                />
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* The "Food Feed" - Featured Items */}
         {featuredItems.length > 0 && !selectedCategory && !searchQuery && (
           <section className="mb-12">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-black text-gray-900 flex items-center gap-2">
-                <Heart className="w-5 h-5 text-red-500 fill-red-500" />
-                Recomendado para Si
+              <h3 className="text-2xl font-black text-gray-900 flex items-center gap-2 tracking-tighter">
+                <Heart className="w-6 h-6 text-red-500 fill-red-500 animate-pulse" />
+                Explorar Delícias
               </h3>
-              <Link href="/nearby" className="text-xs font-black text-orange-600 flex items-center gap-1 hover:underline">
-                Ver Todos <ChevronRight className="w-3 h-3" />
+              <Link href="/nearby" className="text-xs font-black text-orange-600 flex items-center gap-1 hover:underline uppercase tracking-widest">
+                Novidades <ChevronRight className="w-3 h-3" />
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featuredItems.slice(0, 3).map((itemData, idx) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {featuredItems.map((itemData, idx) => (
                 <FoodFeedCard
                   key={`${itemData.restaurant.id}-${itemData.item.id}`}
                   item={itemData.item}
@@ -195,22 +219,55 @@ export default function FastFoodPage() {
           </section>
         )}
 
+        {/* Popular Restaurants Section */}
+        {!searchQuery && !selectedCategory && exploreData?.new_restaurants?.length > 0 && (
+          <section className="mb-12">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-black text-gray-900 flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-emerald-500" />
+                Novos na Plataforma
+              </h3>
+            </div>
+            <div className="flex gap-4 overflow-x-auto hide-scrollbar -mx-4 px-4 pb-4">
+              {exploreData.new_restaurants.map((res: Restaurant) => (
+                <Link
+                  key={`new-res-${res.id}`}
+                  href={`/${res.slug}`}
+                  className="flex-shrink-0 w-64 bg-white rounded-3xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-all group"
+                >
+                  <div className="relative aspect-video rounded-2xl overflow-hidden mb-3">
+                    <img
+                      src={res.cover_image || '/images/restaurant-placeholder.jpg'}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-md px-2 py-1 rounded-lg text-[10px] font-black text-gray-900">
+                      NEW
+                    </div>
+                  </div>
+                  <h4 className="font-black text-gray-900 truncate">{res.name}</h4>
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{res.province} • {res.district}</p>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* Restaurants Section */}
         <section>
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-black text-gray-900 flex items-center gap-2">
               <UtensilsCrossed className="w-5 h-5 text-orange-500" />
-              {loading ? 'Buscando...' : 'Restaurantes'}
+              {searchQuery ? 'Restaurantes Encontrados' : (selectedCategory ? `Restaurantes: ${selectedCategory}` : 'Restaurantes Populares')}
             </h3>
             {restaurants.length > 0 && (
-              <span className="px-3 py-1 rounded-full bg-gray-100 text-[10px] font-black text-gray-500 uppercase">
+              <span className="px-3 py-1 rounded-full bg-gray-100 text-[10px] font-black text-gray-500 uppercase tracking-widest">
                 {restaurants.length} Lugares
               </span>
             )}
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl">
               {[...Array(4)].map((_, i) => (
                 <div key={i} className="bg-white rounded-[1.5rem] shadow-sm h-48 animate-pulse p-4 flex gap-4">
                   <div className="w-48 bg-gray-100 rounded-xl"></div>
@@ -228,10 +285,10 @@ export default function FastFoodPage() {
                 <Utensils className="w-10 h-10 text-gray-300" />
               </div>
               <h4 className="text-lg font-black text-gray-900 mb-2">Sem resultados</h4>
-              <p className="text-gray-400 text-sm font-medium">Não encontramos restaurantes com estes filtros.</p>
+              <p className="text-gray-400 text-sm font-medium">Não encontramos o que procura. Tente outra pesquisa.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl">
               {restaurants.map((restaurant) => (
                 <RestaurantCard key={restaurant.id} restaurant={restaurant} />
               ))}
