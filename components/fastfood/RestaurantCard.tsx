@@ -22,7 +22,7 @@ export default function RestaurantCard({ restaurant }: RestaurantCardProps) {
       whileHover={{ scale: 1.01 }}
       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
     >
-      <Link href={`/${restaurant.id}`}>
+      <Link href={`/${restaurant.slug}`}>
         <div className="bg-white rounded-[1.5rem] border border-gray-100 overflow-hidden group flex flex-row h-full hover:shadow-xl hover:border-orange-100 transition-all duration-300">
           {/* Cover Image */}
           <div className="relative w-32 sm:w-40 md:w-56 lg:w-64 flex-shrink-0 overflow-hidden bg-gray-100">

@@ -188,7 +188,7 @@ export default function FastFoodPage() {
                   key={`${itemData.restaurant.id}-${itemData.item.id}`}
                   item={itemData.item}
                   restaurantName={itemData.restaurant.name}
-                  onClick={() => router.push(`/${itemData.restaurant.id}#item-${itemData.item.id}`)}
+                  onClick={() => router.push(`/${itemData.restaurant.slug}#item-${itemData.item.id}`)}
                 />
               ))}
             </div>

@@ -17,7 +17,7 @@ import { cn } from '@/lib/utils';
 export default function RestaurantDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const restaurantId = parseInt(params.id as string);
+  const restaurantSlug = params.slug as string;
   const scrollRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useScroll();
 
@@ -61,8 +61,10 @@ export default function RestaurantDetailPage() {
   const contentY = useTransform(scrollY, [0, 200], [0, -20]);
 
   useEffect(() => {
-    fetchRestaurant();
-  }, [restaurantId]);
+    if (restaurantSlug) {
+      fetchRestaurant();
+    }
+  }, [restaurantSlug]);
 
   useEffect(() => {
     if (restaurant?.latitude && restaurant?.longitude && typeof navigator !== 'undefined' && navigator.geolocation) {
@@ -83,11 +85,10 @@ export default function RestaurantDetailPage() {
   const fetchRestaurant = async () => {
     try {
       setLoading(true);
-      const [restaurantData, catalogData] = await Promise.all([
-        fastfoodApi.getRestaurant(restaurantId),
-        fastfoodApi.getCatalog(restaurantId)
-      ]);
+      const restaurantData = await fastfoodApi.getRestaurantBySlug(restaurantSlug);
       setRestaurant(restaurantData);
+
+      const catalogData = await fastfoodApi.getCatalog(restaurantData.id);
       setCatalog(catalogData);
 
       if (catalogData.length > 0) {
@@ -168,12 +169,12 @@ export default function RestaurantDetailPage() {
 
   // Load tabs and tables when orderType is local
   useEffect(() => {
-    if (orderType === 'local' && restaurantId) {
+    if (orderType === 'local' && restaurant?.id) {
       const loadTabsAndTables = async () => {
         try {
           const [tabsData, tablesData] = await Promise.all([
-            fastfoodApi.getTabs(restaurantId, 'open'),
-            fastfoodApi.getTables(restaurantId)
+            fastfoodApi.getTabs(restaurant.id, 'open'),
+            fastfoodApi.getTables(restaurant.id)
           ]);
           setTabs(tabsData);
           setTables(tablesData);
@@ -183,7 +184,7 @@ export default function RestaurantDetailPage() {
       };
       loadTabsAndTables();
     }
-  }, [orderType, restaurantId]);
+  }, [orderType, restaurant?.id]);
 
   const handleCreateTab = async () => {
     if (!newTabName.trim()) {
@@ -191,7 +192,7 @@ export default function RestaurantDetailPage() {
       return;
     }
     try {
-      const newTab = await fastfoodApi.createTab(restaurantId, {
+      const newTab = await fastfoodApi.createTab(restaurant!.id, {
         client_name: newTabName,
         client_phone: newTabPhone || undefined
       });
@@ -216,7 +217,7 @@ export default function RestaurantDetailPage() {
 
     try {
       const orderData = {
-        restaurant_id: Number(restaurantId),
+        restaurant_id: Number(restaurant?.id),
         order_type: orderType,
         payment_method: paymentMethod,
         delivery_address: orderType === 'distance' ? deliveryAddress : undefined,

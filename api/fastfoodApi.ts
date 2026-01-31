@@ -47,6 +47,11 @@ export const fastfoodApi = {
     return response.data;
   },
 
+  async getRestaurantBySlug(slug: string): Promise<Restaurant> {
+    const response = await api.get(`/fastfood/restaurants/s/${slug}`);
+    return response.data;
+  },
+
   async searchRestaurants(params: RestaurantSearchParams): Promise<Restaurant[]> {
     const response = await api.get('/fastfood/restaurants/search/', { params });
     return response.data;
