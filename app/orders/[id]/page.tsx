@@ -55,16 +55,33 @@ export default function OrderDetailsPage() {
         };
     }, [params.id]);
 
-    const fetchOrderDetails = async (id: string) => {
+    // Polling fallback for status updates (every 20 seconds)
+    useEffect(() => {
+        if (!order) return;
+
+        // Only poll if the order is in an active state
+        const isActive = !['completed', 'cancelled', 'rejected'].includes(order.status);
+
+        if (!isActive) return;
+
+        const interval = setInterval(() => {
+            console.log('Polling: Checking order status...');
+            fetchOrderDetails(String(order.id), false); // Pass false to avoid showing full-page loader
+        }, 20000);
+
+        return () => clearInterval(interval);
+    }, [order?.id, order?.status]);
+
+    const fetchOrderDetails = async (id: string, showLoading = true) => {
         try {
-            setLoading(true);
+            if (showLoading) setLoading(true);
             const data = await fastfoodApi.getOrderDetails(Number(id));
             setOrder(data);
         } catch (error) {
             console.error('Error fetching order details:', error);
-            toast.error('Erro ao carregar detalhes do pedido');
+            if (showLoading) toast.error('Erro ao carregar detalhes do pedido');
         } finally {
-            setLoading(false);
+            if (showLoading) setLoading(false);
         }
     };
 
@@ -143,10 +160,24 @@ export default function OrderDetailsPage() {
                     className="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100"
                 >
                     {isCancelled || isRejected ? (
-                        <div className={cn("flex flex-col items-center py-4", isRejected ? "text-red-600" : "text-red-500")}>
-                            {isRejected ? <AlertCircle className="w-16 h-16 mb-2" /> : <XCircle className="w-16 h-16 mb-2" />}
-                            <h2 className="text-xl font-bold">{isRejected ? "Pedido Rejeitado" : "Pedido Cancelado"}</h2>
-                            <p className="text-sm opacity-80">{isRejected ? "O restaurante não pôde aceitar este pedido." : "Este pedido foi cancelado."}</p>
+                        <div className={cn(
+                            "flex flex-col items-center py-6 px-4 rounded-[1.5rem] text-center",
+                            isRejected ? "bg-red-50 text-red-600 border border-red-100" : "bg-gray-50 text-gray-500 border border-gray-100"
+                        )}>
+                            {isRejected ? (
+                                <AlertCircle className="w-16 h-16 mb-4 animate-bounce" />
+                            ) : (
+                                <XCircle className="w-16 h-16 mb-4" />
+                            )}
+                            <h2 className="text-2xl font-black mb-2">
+                                {isRejected ? "Pedido Rejeitado" : "Pedido Cancelado"}
+                            </h2>
+                            <p className="text-sm font-medium max-w-xs mx-auto">
+                                {isRejected
+                                    ? "Pedimos desculpa, mas o restaurante não pôde aceitar o seu pedido neste momento. Se usou SkyWallet, o valor foi reembolsado."
+                                    : "Este pedido foi cancelado e não será processado."
+                                }
+                            </p>
                         </div>
                     ) : (
                         <div className="relative">
