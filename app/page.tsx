@@ -1,4 +1,31 @@
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import {
+  ShieldCheck, Star, TrendingUp, Utensils,
+  UtensilsCrossed, X, Menu, Bell,
+  Navigation, ShoppingBag, Search
+} from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
+import RestaurantCard from '@/components/fastfood/RestaurantCard';
+import fastfoodApi from '@/api/fastfoodApi';
+import type { Restaurant } from '@/types/fastfood';
+import toast from 'react-hot-toast';
+import { cn } from '@/lib/utils';
+import Link from 'next/link';
 import PromoBanner from '@/components/fastfood/PromoBanner';
+
+const FOOD_CATEGORIES = [
+  { name: 'Tudo', icon: '🍽️', slug: '' },
+  { name: 'Pizza', icon: '🍕', slug: 'Pizza' },
+  { name: 'Búrguer', icon: '🍔', slug: 'Burger' },
+  { name: 'Chinesa', icon: '🥡', slug: 'Chinese' },
+  { name: 'Sushi', icon: '🍣', slug: 'Sushi' },
+  { name: 'Italiana', icon: '🍝', slug: 'Italiana' },
+  { name: 'Frango', icon: '🍗', slug: 'Chicken' },
+  { name: 'Doces', icon: '🍩', slug: 'Dessert' },
+];
 
 export default function FastFoodPage() {
   const router = useRouter();

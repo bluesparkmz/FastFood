@@ -286,87 +286,34 @@ export default function RestaurantDetailPage() {
   return (
     <div className="min-h-screen bg-gray-50 pb-32 font-sans selection:bg-orange-100 selection:text-orange-900">
 
-      {/* Immersive Header */}
-      <motion.div
-        style={{ height: headerHeight, opacity: headerOpacity }}
-        className="relative w-full overflow-hidden z-0"
-      >
+      {/* Hero Section - Streamlined */}
+      <div className="relative w-full h-[300px] overflow-hidden">
         {coverImage ? (
-          <motion.img
+          <Image
             src={coverImage}
             alt={restaurant.name}
-            className="w-full h-full object-cover"
-            initial={{ scale: 1.1 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.8 }}
+            fill
+            className="object-cover"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
-            <span className="text-white/20 text-4xl font-black uppercase tracking-widest">SkyVenda</span>
-          </div>
+          <div className="w-full h-full bg-orange-500" />
         )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
 
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent" />
-
-        {/* Back Button */}
-        <button
-          onClick={() => router.back()}
-          className="absolute top-6 left-6 p-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 transition-all z-20 active:scale-95"
-        >
-          <ArrowLeft className="w-6 h-6" />
-        </button>
-
-        {/* Restaurant Info */}
-        <div className="absolute bottom-0 left-0 w-full p-6 md:p-10 z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="max-w-7xl mx-auto"
-          >
-            <div className="flex flex-wrap items-center gap-3 mb-3">
-              {isOpen ? (
-                <span className="px-3 py-1 rounded-full bg-emerald-500/90 text-white text-xs font-bold uppercase tracking-wide backdrop-blur-sm border border-emerald-400/30 shadow-lg shadow-emerald-900/20">
-                  Aberto Agora
-                </span>
-              ) : (
-                <span className="px-3 py-1 rounded-full bg-red-500/90 text-white text-xs font-bold uppercase tracking-wide backdrop-blur-sm border border-red-400/30">
-                  Fechado
-                </span>
-              )}
-              <span className="px-3 py-1 rounded-full bg-white/20 text-white text-xs font-bold backdrop-blur-sm border border-white/10 flex items-center gap-1">
-                <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+        <div className="absolute bottom-10 left-0 w-full px-6">
+          <div className="max-w-7xl mx-auto flex flex-col gap-2">
+            <h1 className="text-3xl font-black text-white tracking-tight">{restaurant.name}</h1>
+            <div className="flex items-center gap-3 text-white/80 text-xs font-bold uppercase tracking-widest">
+              <span className="flex items-center gap-1">
+                <Star className="w-3 h-3 text-orange-500 fill-orange-500" />
                 {restaurant.rating.toFixed(1)}
               </span>
-              <span className="px-3 py-1 rounded-full bg-white/20 text-white text-xs font-bold backdrop-blur-sm border border-white/10 flex items-center gap-1">
-                <Clock className="w-3 h-3" />
-                {restaurant.opening_time?.slice(0, 5)} - {restaurant.closing_time?.slice(0, 5)}
-              </span>
+              <span>•</span>
+              <span>{restaurant.category || 'Restaurante'}</span>
             </div>
-
-            <h1 className="text-4xl md:text-6xl font-black text-white mb-2 tracking-tight drop-shadow-sm">
-              {restaurant.name}
-            </h1>
-
-            <div className="flex items-center gap-2 text-gray-300 text-sm md:text-base font-medium">
-              <MapPin className="w-4 h-4 text-orange-500" />
-              <span>
-                {restaurant.district}, {restaurant.province} • {userDistance !== null ? (
-                  <a
-                    href={restaurant.location_google_maps || `https://www.google.com/maps/search/?api=1&query=${restaurant.latitude},${restaurant.longitude}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-bold text-indigo-400 hover:text-indigo-300 transition-colors"
-                  >
-                    {userDistance.toFixed(1)} km
-                  </a>
-                ) : 'Mapa'}
-              </span>
-            </div>
-          </motion.div>
+          </div>
         </div>
-      </motion.div>
+      </div>
 
       {/* Main Content Area */}
       <motion.div

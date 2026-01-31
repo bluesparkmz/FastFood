@@ -35,8 +35,8 @@ export default function SearchPage() {
         try {
             setLoading(true);
             setIsSearching(true);
-            const data = await fastfoodApi.searchRestaurants({ name: query });
-            setResults(data);
+            const data = await fastfoodApi.searchAll(query);
+            setResults(data.restaurants);
         } catch (error) {
             console.error('Search error:', error);
         } finally {
