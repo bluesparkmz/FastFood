@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 
-export default function AuthCallbackPage() {
+function AuthCallbackContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -15,9 +15,6 @@ export default function AuthCallbackPage() {
         if (token) {
             // Store token consistent with api/api.js
             localStorage.setItem('auth_token', token);
-
-            // Dispatch a storage event or similar if we need to update context elsewhere, 
-            // but simple redirect works for now.
 
             // Redirect to next page
             router.replace(next);
@@ -38,5 +35,17 @@ export default function AuthCallbackPage() {
                 <p className="text-gray-500 font-medium animate-pulse">Autenticando...</p>
             </motion.div>
         </div>
+    );
+}
+
+export default function AuthCallbackPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" />
+            </div>
+        }>
+            <AuthCallbackContent />
+        </Suspense>
     );
 }

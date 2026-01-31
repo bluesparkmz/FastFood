@@ -17,7 +17,10 @@ export interface CatalogProduct {
   image: string | null;
   emoji: string | null;
   is_fastfood: boolean;
+  is_available?: boolean;
 }
+
+export interface MenuItem extends CatalogProduct { }
 
 export interface Restaurant {
   id: number;

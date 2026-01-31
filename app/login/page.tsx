@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Lock, User, CheckCircle, AlertCircle, ArrowRight } from 'lucide-react'; // Using Lucide icons as per project style
@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import api from '@/api/api';
 // import { useAuth } from '@/contexts/AuthContext'; // If we add AuthContext later
 
-export default function LoginPage() {
+function LoginContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const next = searchParams.get('next') || '/';
@@ -187,5 +187,17 @@ export default function LoginPage() {
                 </div>
             </motion.div>
         </div>
+    );
+}
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" />
+            </div>
+        }>
+            <LoginContent />
+        </Suspense>
     );
 }

@@ -223,6 +223,7 @@ export default function RestaurantDetailPage() {
         tab_id: orderType === 'local' && selectedTab ? selectedTab : undefined,
         table_id: orderType === 'local' && selectedTable ? selectedTable : undefined,
         items: Array.from(cart.values()).map(item => ({
+          item_type: item.item_type || 'menu_item',
           item_id: item.item_id,
           quantity: item.quantity
         }))
