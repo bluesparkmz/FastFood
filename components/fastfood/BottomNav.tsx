@@ -12,7 +12,7 @@ const BottomNav = () => {
 
     const navItems = [
         { icon: Home, label: 'Início', path: '/' },
-        { icon: Search, label: 'Busca', path: '/nearby' },
+        { icon: Search, label: 'Busca', path: '/search' },
         { icon: ShoppingBag, label: 'Pedidos', path: '/orders' },
         { icon: Settings, label: 'Conta', path: '/settings' },
     ];

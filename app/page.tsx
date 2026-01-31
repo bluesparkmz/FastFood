@@ -1,29 +1,4 @@
-'use client';
-
-import React, { useEffect, useState, useMemo } from 'react';
-import { Search, Filter, MapPin, Plus, Menu, X, UtensilsCrossed, Settings, ShoppingBag, TrendingUp, LayoutDashboard, Navigation, Utensils, Heart, ChevronRight, Bell } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
-import RestaurantCard from '@/components/fastfood/RestaurantCard';
-import FoodFeedCard from '@/components/fastfood/FoodFeedCard';
-import fastfoodApi from '@/api/fastfoodApi';
-import type { Restaurant, CatalogProduct } from '@/types/fastfood';
-import toast from 'react-hot-toast';
-import { cn } from '@/lib/utils';
-import { Star, ShieldCheck } from 'lucide-react';
-
-
-const FOOD_CATEGORIES = [
-  { name: 'Tudo', icon: '🍽️', slug: '' },
-  { name: 'Pizza', icon: '🍕', slug: 'Pizza' },
-  { name: 'Búrguer', icon: '🍔', slug: 'Burger' },
-  { name: 'Chinesa', icon: '🥡', slug: 'Chinese' },
-  { name: 'Sushi', icon: '🍣', slug: 'Sushi' },
-  { name: 'Italiana', icon: '🍝', slug: 'Italiana' },
-  { name: 'Frango', icon: '🍗', slug: 'Chicken' },
-  { name: 'Doces', icon: '🍩', slug: 'Dessert' },
-];
+import PromoBanner from '@/components/fastfood/PromoBanner';
 
 export default function FastFoodPage() {
   const router = useRouter();
@@ -36,12 +11,6 @@ export default function FastFoodPage() {
   const [selectedProvince, setSelectedProvince] = useState<string>('');
   const [showMenu, setShowMenu] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   useEffect(() => {
     fetchData();
@@ -78,82 +47,42 @@ export default function FastFoodPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
-      {/* Premium Compact Header */}
-      <header
-        className={cn(
-          "fixed top-0 left-0 w-full z-50 transition-all duration-300 px-4 py-3 flex items-center justify-between",
-          isScrolled ? "bg-white/80 backdrop-blur-xl border-b border-gray-100 shadow-sm" : "bg-transparent"
-        )}
-      >
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-orange-500 flex items-center justify-center text-white shadow-orange-200 shadow-lg">
-            <Utensils className="w-6 h-6" />
-          </div>
-          <div>
-            <h1 className={cn("text-lg font-black tracking-tight transition-colors", isScrolled ? "text-gray-900" : "text-gray-900")}>
-              Fast<span className="text-orange-600">Food</span>
-            </h1>
-          </div>
-        </div>
+      {/* Hero / Promo Section */}
+      <section className="px-6 py-4">
+        <PromoBanner
+          image="/images/promo_burger_banner.png"
+          title="Grab Our Exclusive Discounts Now!"
+          subtitle="Os melhores sabores da cidade com até 45% de desconto."
+          discount="45%"
+          onAction={() => router.push('/search')}
+        />
+      </section>
 
-        <div className="flex items-center gap-2">
-          <button className="p-2 rounded-xl bg-white border border-gray-100 text-gray-500 shadow-sm">
-            <Bell className="w-5 h-5" />
-          </button>
-          <button
-            onClick={() => setShowMenu(true)}
-            className="p-2 rounded-xl bg-gray-900 text-white shadow-xl"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
-        </div>
-      </header>
-
-      {/* Hero / Search Section */}
-      <section className="pt-28 pb-8 px-4 bg-white relative overflow-hidden">
-        <div className="absolute -top-24 -right-24 w-64 h-64 bg-orange-500/5 rounded-full blur-3xl" />
-        <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-red-500/5 rounded-full blur-3xl" />
-
-        <div className="max-w-2xl mx-auto relative z-10">
-          <h2 className="text-3xl font-black text-gray-900 mb-6 tracking-tighter leading-tight">
-            O que vamos <span className="text-orange-500">comer</span> <br />hoje? 😋
-          </h2>
-
-          {/* Premium Search Bar */}
-          <div className="relative mb-8 group">
-            <div className="absolute inset-0 bg-orange-500/10 blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity" />
-            <div className="relative flex items-center bg-gray-50 border border-gray-100 rounded-[2rem] p-1 shadow-sm focus-within:bg-white focus-within:ring-2 focus-within:ring-orange-500/20 transition-all">
-              <div className="pl-5">
-                <Search className="w-5 h-5 text-gray-400" />
+      {/* Modern Categories Grid */}
+      <section className="px-6 py-8 overflow-x-auto no-scrollbar">
+        <div className="flex items-start gap-6 min-w-max">
+          {FOOD_CATEGORIES.map((cat) => (
+            <button
+              key={cat.name}
+              onClick={() => setSelectedCategory(cat.slug)}
+              className="flex flex-col items-center gap-3 group"
+            >
+              <div className={cn(
+                "w-16 h-16 rounded-2xl flex items-center justify-center text-2xl transition-all duration-300 shadow-sm",
+                selectedCategory === cat.slug
+                  ? "bg-orange-500 text-white scale-110 shadow-lg shadow-orange-200"
+                  : "bg-white text-gray-400 group-hover:bg-gray-100 group-hover:text-gray-900"
+              )}>
+                {cat.icon}
               </div>
-              <input
-                type="text"
-                placeholder="Pizza, burguer, restaurante..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-transparent py-4 px-4 text-sm font-bold placeholder:text-gray-300 focus:outline-none"
-              />
-            </div>
-          </div>
-
-          {/* Category Slider */}
-          <div className="flex items-center gap-3 overflow-x-auto hide-scrollbar -mx-4 px-4">
-            {FOOD_CATEGORIES.map((cat) => (
-              <button
-                key={cat.name}
-                onClick={() => setSelectedCategory(cat.slug)}
-                className={cn(
-                  "flex items-center gap-2 px-6 py-3 rounded-2xl whitespace-nowrap text-xs font-black uppercase tracking-widest transition-all",
-                  selectedCategory === cat.slug
-                    ? "bg-orange-500 text-white shadow-orange-200 shadow-lg scale-105"
-                    : "bg-gray-50 text-gray-400 hover:bg-white hover:text-orange-500 hover:shadow-sm"
-                )}
-              >
-                <span className="text-lg">{cat.icon}</span>
+              <span className={cn(
+                "text-[10px] font-black uppercase tracking-widest transition-colors",
+                selectedCategory === cat.slug ? "text-orange-600" : "text-gray-400"
+              )}>
                 {cat.name}
-              </button>
-            ))}
-          </div>
+              </span>
+            </button>
+          ))}
         </div>
       </section>
 
