@@ -8,22 +8,24 @@ import type { Restaurant } from '@/types/fastfood';
 import toast from 'react-hot-toast';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AuthContext } from '@/context/AuthContext';
 
 export default function MyRestaurantsPage() {
   const router = useRouter();
-  const authContext = useContext(AuthContext);
+  const [token, setToken] = useState<string | null>(null);
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
 
   // Verificar autenticação
   useEffect(() => {
-    if (!authContext?.token) {
+    const storedToken = localStorage.getItem('auth_token');
+    if (!storedToken) {
       toast.error('Você precisa fazer login primeiro');
       router.push('/login');
+    } else {
+      setToken(storedToken);
     }
-  }, [authContext?.token, router]);
+  }, [router]);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
