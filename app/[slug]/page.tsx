@@ -270,10 +270,17 @@ export default function RestaurantDetailPage() {
 
   const isOpen = restaurant.is_open;
   const coverImage = restaurant.cover_image ? getImageUrl(restaurant.cover_image) : null;
-  const categoriesList = Array.from(new Set(catalog.map(i => i.category).filter(Boolean)));
+  const categoriesList = Array.from(new Set(catalog.map(i => i.category).filter(Boolean) as string[]));
+  const hasItemsWithoutCategory = catalog.some(i => !i.category);
+
+  const displayCategories = [...categoriesList];
+  if (hasItemsWithoutCategory) {
+    displayCategories.push("Geral");
+  }
+
   const categories = [
     { id: 'all', name: 'Tudo', type: 'all' },
-    ...categoriesList.map(cat => ({ id: cat as string, name: cat as string, type: 'category' }))
+    ...displayCategories.map(cat => ({ id: cat, name: cat, type: 'category' }))
   ];
 
   return (
@@ -408,8 +415,10 @@ export default function RestaurantDetailPage() {
 
           {/* Menu Sections */}
           <div className="space-y-12 pb-24">
-            {categoriesList.filter((c): c is string => !!c).map((categoryName) => {
-              const itemsInCategory = catalog.filter(item => item.category === categoryName);
+            {displayCategories.map((categoryName) => {
+              const itemsInCategory = catalog.filter(item =>
+                (categoryName === "Geral" && !item.category) || (item.category === categoryName)
+              );
               const filteredItems = itemsInCategory.filter(item =>
                 item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -438,6 +447,17 @@ export default function RestaurantDetailPage() {
                 </section>
               );
             })}
+
+            {/* Empty State for Catalog */}
+            {catalog.length === 0 && !loading && (
+              <div className="text-center py-20 bg-white rounded-[2.5rem] shadow-soft border border-dashed border-gray-200">
+                <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <ShoppingCart className="w-10 h-10 text-gray-300" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Cardápio não disponível</h3>
+                <p className="text-gray-500 max-w-xs mx-auto">Este restaurante ainda não adicionou produtos ao cardápio digital.</p>
+              </div>
+            )}
 
             {/* Empty State for Search */}
             {searchTerm &&
