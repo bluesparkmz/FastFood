@@ -17,6 +17,7 @@ const statusConfig = {
   delivering: { label: 'Em entrega', bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200' },
   completed: { label: 'Concluído', bg: 'bg-gray-50', text: 'text-gray-700', border: 'border-gray-200' },
   cancelled: { label: 'Cancelado', bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-200' },
+  rejected: { label: 'Rejeitado', bg: 'bg-red-50', text: 'text-red-800', border: 'border-red-300' },
 };
 
 export default function OrderCard({ order, onViewDetails }: OrderCardProps) {

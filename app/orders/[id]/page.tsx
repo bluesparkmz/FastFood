@@ -110,6 +110,7 @@ export default function OrderDetailsPage() {
 
     const currentStepIndex = statusSteps.findIndex(step => step.id === order.status);
     const isCancelled = order.status === 'cancelled';
+    const isRejected = order.status === 'rejected';
 
     return (
         <div className="min-h-screen bg-gray-50 pb-20 font-sans">
@@ -141,11 +142,11 @@ export default function OrderDetailsPage() {
                     animate={{ opacity: 1, y: 0 }}
                     className="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100"
                 >
-                    {isCancelled ? (
-                        <div className="flex flex-col items-center text-red-500 py-4">
-                            <XCircle className="w-16 h-16 mb-2" />
-                            <h2 className="text-xl font-bold">Pedido Cancelado</h2>
-                            <p className="text-sm text-red-400">Este pedido foi cancelado.</p>
+                    {isCancelled || isRejected ? (
+                        <div className={cn("flex flex-col items-center py-4", isRejected ? "text-red-600" : "text-red-500")}>
+                            {isRejected ? <AlertCircle className="w-16 h-16 mb-2" /> : <XCircle className="w-16 h-16 mb-2" />}
+                            <h2 className="text-xl font-bold">{isRejected ? "Pedido Rejeitado" : "Pedido Cancelado"}</h2>
+                            <p className="text-sm opacity-80">{isRejected ? "O restaurante não pôde aceitar este pedido." : "Este pedido foi cancelado."}</p>
                         </div>
                     ) : (
                         <div className="relative">

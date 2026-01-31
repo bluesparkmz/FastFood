@@ -61,7 +61,7 @@ export interface FastFoodOrder {
   user_id: number;
   customer_name?: string;
   customer_phone?: string;
-  status: 'pending' | 'preparing' | 'ready' | 'delivering' | 'completed' | 'cancelled';
+  status: 'pending' | 'preparing' | 'ready' | 'delivering' | 'completed' | 'cancelled' | 'rejected';
   order_type: 'local' | 'distance';
   total_value: number;
   payment_method: 'cash' | 'skywallet' | 'pos' | 'mpesa';
@@ -162,7 +162,7 @@ export interface OrderCreate {
 }
 
 export interface OrderStatusUpdate {
-  status: 'pending' | 'preparing' | 'ready' | 'delivering' | 'completed' | 'cancelled';
+  status: 'pending' | 'preparing' | 'ready' | 'delivering' | 'completed' | 'cancelled' | 'rejected';
 }
 
 export interface RestaurantReview {
