@@ -29,7 +29,6 @@ const FOOD_CATEGORIES = [
 export default function FastFoodPage() {
   const router = useRouter();
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const [featuredItems, setFeaturedItems] = useState<any[]>([]);
   const [exploreData, setExploreData] = useState<any>(null);
   const [searchResults, setSearchResults] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -67,15 +66,6 @@ export default function FastFoodPage() {
       } else {
         const explore = await fastfoodApi.getExploreFeed();
         setExploreData(explore);
-        setFeaturedItems(explore.featured_products.map((p: any) => ({
-          item: p,
-          restaurant: {
-            id: p.restaurant_id,
-            name: p.restaurant_name,
-            slug: p.restaurant_slug,
-            cover_image: p.restaurant_cover_image
-          }
-        })));
         setRestaurants(explore.popular_restaurants);
         setSearchResults(null);
       }
@@ -171,51 +161,7 @@ export default function FastFoodPage() {
       {/* Main Content Area */}
       <main className="max-w-7xl mx-auto px-4 py-8">
 
-        {/* Search Results - Products */}
-        {searchQuery && searchResults?.products?.length > 0 && (
-          <section className="mb-12">
-            <h3 className="text-xl font-black text-gray-900 mb-6 flex items-center gap-2">
-              <ShoppingBag className="w-5 h-5 text-orange-500" />
-              Produtos Encontrados
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {searchResults.products.map((p: any) => (
-                <FoodFeedCard
-                  key={`search-prod-${p.id}`}
-                  item={p}
-                  restaurantName={p.restaurant_name}
-                  onClick={() => router.push(`/${p.restaurant_slug}#item-${p.id}`)}
-                />
-              ))}
-            </div>
-          </section>
-        )}
 
-        {/* The "Food Feed" - Featured Items */}
-        {featuredItems.length > 0 && !selectedCategory && !searchQuery && (
-          <section className="mb-12">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-black text-gray-900 flex items-center gap-2 tracking-tighter">
-                <Heart className="w-6 h-6 text-red-500 fill-red-500 animate-pulse" />
-                Explorar Delícias
-              </h3>
-              <Link href="/nearby" className="text-xs font-black text-orange-600 flex items-center gap-1 hover:underline uppercase tracking-widest">
-                Novidades <ChevronRight className="w-3 h-3" />
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {featuredItems.map((itemData, idx) => (
-                <FoodFeedCard
-                  key={`${itemData.restaurant.id}-${itemData.item.id}`}
-                  item={itemData.item}
-                  restaurantName={itemData.restaurant.name}
-                  onClick={() => router.push(`/${itemData.restaurant.slug}#item-${itemData.item.id}`)}
-                />
-              ))}
-            </div>
-          </section>
-        )}
 
         {/* Popular / Suggested Restaurants Section */}
         {!searchQuery && !selectedCategory && restaurants.length > 0 && (
