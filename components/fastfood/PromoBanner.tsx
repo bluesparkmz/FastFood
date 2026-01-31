@@ -17,7 +17,7 @@ export default function PromoBanner({ image, title, subtitle, discount, onAction
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="relative w-full h-[200px] rounded-[2rem] overflow-hidden shadow-lg shadow-orange-500/20"
+            className="relative w-full h-[200px] rounded-xl overflow-hidden shadow-lg shadow-orange-500/20"
         >
             {/* Orange Gradient Background */}
             <div className="absolute inset-0 bg-gradient-to-br from-orange-500 via-orange-600 to-orange-700" />
@@ -31,10 +31,10 @@ export default function PromoBanner({ image, title, subtitle, discount, onAction
             </div>
 
             {/* Content Container */}
-            <div className="relative h-full flex items-center justify-between px-6 md:px-8">
+            <div className="relative h-full flex items-center justify-between px-4 md:px-6">
                 {/* Left Side: Text Content */}
                 <div className="flex-1 pr-4 z-10">
-                    <h2 className="text-white text-xl md:text-2xl font-black leading-tight mb-3 drop-shadow-md">
+                    <h2 className="text-white text-xl md:text-2xl font-black leading-tight mb-2 drop-shadow-md">
                         {title}
                     </h2>
 

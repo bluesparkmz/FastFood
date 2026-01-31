@@ -76,7 +76,7 @@ export default function FastFoodPage() {
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* Hero / Promo Section */}
-      <section className="px-6 py-4">
+      <section className="px-4 py-3">
         <PromoBanner
           image="/images/promo_burger_banner.png"
           title="Grab Our Exclusive Discounts Now!"
