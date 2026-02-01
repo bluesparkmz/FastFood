@@ -69,18 +69,36 @@ export function HomeProvider({ children }: { children: React.ReactNode }) {
 
         try {
             setIsLocating(true);
-            const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-                navigator.geolocation.getCurrentPosition(resolve, reject, {
+
+            // Try high accuracy first with a shorter timeout
+            const getPosition = (options: PositionOptions): Promise<GeolocationPosition> => {
+                return new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, options);
+                });
+            };
+
+            let position: GeolocationPosition;
+            try {
+                position = await getPosition({
                     enableHighAccuracy: true,
                     timeout: 5000,
                     maximumAge: 0
                 });
-            });
+            } catch (e) {
+                console.warn('High accuracy geolocation timed out or failed, trying low accuracy...');
+                position = await getPosition({
+                    enableHighAccuracy: false,
+                    timeout: 10000,
+                    maximumAge: Infinity
+                });
+            }
 
             const { latitude, longitude } = position.coords;
             const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10`);
-            const data = await res.json();
 
+            if (!res.ok) throw new Error('Failed to fetch address');
+
+            const data = await res.json();
             if (data.address) {
                 const province = normalizeProvince(data.address);
                 if (province) {
@@ -90,7 +108,6 @@ export function HomeProvider({ children }: { children: React.ReactNode }) {
             }
         } catch (error) {
             console.error('Error detecting location:', error);
-            // Don't show toast error as user might have denied permission which is normal
         } finally {
             setIsLocating(false);
         }
