@@ -104,6 +104,11 @@ export const fastfoodApi = {
     return response.data;
   },
 
+  async getUserOrders(): Promise<FastFoodOrder[]> {
+    const response = await api.get('/fastfood/orders/');
+    return response.data;
+  },
+
   async getRestaurantOrders(restaurantId: number): Promise<FastFoodOrder[]> {
     const response = await api.get(`/fastfood/restaurants/${restaurantId}/orders/`);
     return response.data;
