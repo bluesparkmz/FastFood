@@ -19,7 +19,8 @@ import type {
   TablePositionUpdate,
   Tab,
   TabCreate,
-  TabUpdate
+  TabUpdate,
+  ExploreFeed
 } from '@/types/fastfood';
 
 // Restaurant APIs
@@ -30,9 +31,9 @@ export const fastfoodApi = {
     return response.data;
   },
 
-  async getRestaurants(skip = 0, limit = 100): Promise<Restaurant[]> {
+  async getRestaurants(skip = 0, limit = 100, province?: string): Promise<Restaurant[]> {
     const response = await api.get('/fastfood/restaurants/explore/', {
-      params: { skip, limit }
+      params: { skip, limit, province }
     });
     return response.data;
   },
@@ -96,8 +97,10 @@ export const fastfoodApi = {
     return response.data;
   },
 
-  async getUserOrders(): Promise<FastFoodOrder[]> {
-    const response = await api.get('/fastfood/orders/');
+  async getExploreFeed(province?: string): Promise<ExploreFeed> {
+    const response = await api.get('/fastfood/explore/', {
+      params: { province }
+    });
     return response.data;
   },
 
@@ -194,11 +197,6 @@ export const fastfoodApi = {
     const response = await api.get('/fastfood/search/all', {
       params: { q: query }
     });
-    return response.data;
-  },
-
-  async getExploreFeed(): Promise<{ featured_products: any[], popular_restaurants: Restaurant[], new_restaurants: Restaurant[] }> {
-    const response = await api.get('/fastfood/explore');
     return response.data;
   }
 };

@@ -20,6 +20,8 @@ interface HomeContextType {
     refreshData: () => Promise<void>;
     loadMore: () => Promise<void>;
     hasMore: boolean;
+    detectLocation: () => Promise<void>;
+    isLocating: boolean;
 }
 
 const HomeContext = createContext<HomeContextType | undefined>(undefined);
@@ -33,11 +35,66 @@ export function HomeProvider({ children }: { children: React.ReactNode }) {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
     const [selectedProvince, setSelectedProvince] = useState('');
+    const [isLocating, setIsLocating] = useState(false);
     const [hasLoadedInitially, setHasLoadedInitially] = useState(false);
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
 
     const LIMIT = 10;
+
+    const normalizeProvince = (addr: any): string => {
+        const state = addr.state || addr.region || addr.province || '';
+        const lowercaseState = state.toLowerCase();
+
+        if (lowercaseState.includes('maputo cidade') || lowercaseState === 'maputo capital') return 'Maputo Cidade';
+        if (lowercaseState.includes('maputo')) return 'Maputo';
+        if (lowercaseState.includes('gaza')) return 'Gaza';
+        if (lowercaseState.includes('inhambane')) return 'Inhambane';
+        if (lowercaseState.includes('sofala')) return 'Sofala';
+        if (lowercaseState.includes('manica')) return 'Manica';
+        if (lowercaseState.includes('tete')) return 'Tete';
+        if (lowercaseState.includes('zambezia')) return 'Zambézia';
+        if (lowercaseState.includes('nampula')) return 'Nampula';
+        if (lowercaseState.includes('niassa')) return 'Niassa';
+        if (lowercaseState.includes('cabo delgado')) return 'Cabo Delgado';
+
+        return '';
+    };
+
+    const detectLocation = useCallback(async () => {
+        if (!navigator.geolocation) {
+            console.log('Geolocation not supported');
+            return;
+        }
+
+        try {
+            setIsLocating(true);
+            const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(resolve, reject, {
+                    enableHighAccuracy: true,
+                    timeout: 5000,
+                    maximumAge: 0
+                });
+            });
+
+            const { latitude, longitude } = position.coords;
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10`);
+            const data = await res.json();
+
+            if (data.address) {
+                const province = normalizeProvince(data.address);
+                if (province) {
+                    setSelectedProvince(province);
+                    toast.success(`Localização detectada: ${province}`, { id: 'loc-detect' });
+                }
+            }
+        } catch (error) {
+            console.error('Error detecting location:', error);
+            // Don't show toast error as user might have denied permission which is normal
+        } finally {
+            setIsLocating(false);
+        }
+    }, []);
 
     const fetchData = useCallback(async (forced = false) => {
         if (hasLoadedInitially && !forced && !searchQuery && !selectedCategory && !selectedProvince && exploreData) {
@@ -53,7 +110,7 @@ export function HomeProvider({ children }: { children: React.ReactNode }) {
                 const results = await fastfoodApi.searchAll(searchQuery);
                 setRestaurants(results.restaurants);
                 setPagedRestaurants([]);
-            } else if (selectedCategory || selectedProvince) {
+            } else if (selectedCategory || (selectedProvince && forced)) {
                 const params: any = {};
                 if (selectedCategory) params.category = selectedCategory;
                 if (selectedProvince) params.province = selectedProvince;
@@ -62,8 +119,8 @@ export function HomeProvider({ children }: { children: React.ReactNode }) {
                 setPagedRestaurants([]);
             } else {
                 const [explore, allRes] = await Promise.all([
-                    fastfoodApi.getExploreFeed(),
-                    fastfoodApi.getRestaurants(0, LIMIT)
+                    fastfoodApi.getExploreFeed(selectedProvince || undefined),
+                    fastfoodApi.getRestaurants(0, LIMIT, selectedProvince || undefined)
                 ]);
                 setExploreData(explore);
                 setRestaurants(explore.popular_restaurants);
@@ -80,13 +137,15 @@ export function HomeProvider({ children }: { children: React.ReactNode }) {
     }, [searchQuery, selectedCategory, selectedProvince, hasLoadedInitially, exploreData]);
 
     const loadMore = async () => {
-        if (loadingMore || !hasMore || searchQuery || selectedCategory || selectedProvince) return;
+        if (loadingMore || !hasMore || searchQuery || selectedCategory) return;
+        // If province is selected but we are in "Explore" mode (no category), pagedRestaurants should probably also filter by province.
+        // But for now let's keep it simple.
 
         try {
             setLoadingMore(true);
             const nextPage = page + 1;
             const skip = nextPage * LIMIT;
-            const moreRes = await fastfoodApi.getRestaurants(skip, LIMIT);
+            const moreRes = await fastfoodApi.getRestaurants(skip, LIMIT, selectedProvince || undefined);
 
             if (moreRes.length < LIMIT) {
                 setHasMore(false);
@@ -102,8 +161,16 @@ export function HomeProvider({ children }: { children: React.ReactNode }) {
     };
 
     useEffect(() => {
-        fetchData();
-    }, [fetchData]);
+        if (!hasLoadedInitially) {
+            detectLocation().finally(() => fetchData());
+        }
+    }, [detectLocation, hasLoadedInitially, fetchData]);
+
+    useEffect(() => {
+        if (hasLoadedInitially) {
+            fetchData();
+        }
+    }, [searchQuery, selectedCategory, selectedProvince]);
 
     const refreshData = () => fetchData(true);
 
@@ -122,7 +189,9 @@ export function HomeProvider({ children }: { children: React.ReactNode }) {
             setSelectedProvince,
             refreshData,
             loadMore,
-            hasMore
+            hasMore,
+            detectLocation,
+            isLocating
         }}>
             {children}
         </HomeContext.Provider>

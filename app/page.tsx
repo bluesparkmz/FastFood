@@ -45,7 +45,9 @@ export default function FastFoodPage() {
     selectedProvince,
     setSelectedProvince,
     loadMore,
-    hasMore
+    hasMore,
+    isLocating,
+    detectLocation
   } = useHome();
 
   const [showMenu, setShowMenu] = useState(false);
@@ -84,13 +86,40 @@ export default function FastFoodPage() {
           isScrolled ? "bg-white/90 backdrop-blur-xl border-b border-gray-100 shadow-sm" : "bg-white"
         )}
       >
-        <div className="flex items-center gap-2" onClick={() => router.push('/')}>
-          <div className="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center text-white shadow-lg shadow-orange-200">
-            <Utensils className="w-5 h-5" />
+        <div className="flex flex-col cursor-pointer" onClick={() => router.push('/')}>
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center text-white shadow-lg shadow-orange-200">
+              <Utensils className="w-5 h-5" />
+            </div>
+            <h1 className="text-xl font-black tracking-tighter text-gray-900 line-height-none">
+              Fast<span className="text-orange-600">Food</span>
+            </h1>
           </div>
-          <h1 className="text-xl font-black tracking-tighter text-gray-900">
-            Fast<span className="text-orange-600">Food</span>
-          </h1>
+          <div
+            onClick={(e) => { e.stopPropagation(); detectLocation(); }}
+            className="flex items-center gap-1 mt-0.5 ml-1 h-3 group"
+          >
+            {isLocating ? (
+              <>
+                <div className="w-2 h-2 border-2 border-orange-500/20 border-t-orange-500 rounded-full animate-spin" />
+                <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest animate-pulse">Localizando...</span>
+              </>
+            ) : selectedProvince ? (
+              <>
+                <Navigation className="w-2.5 h-2.5 text-orange-500 group-hover:animate-bounce" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 group-hover:text-orange-600 transition-colors">
+                  {selectedProvince}
+                </span>
+              </>
+            ) : (
+              <>
+                <Navigation className="w-2.5 h-2.5 text-gray-300 group-hover:text-orange-500 transition-colors" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-gray-300 group-hover:text-gray-600 transition-colors">
+                  Definir Local
+                </span>
+              </>
+            )}
+          </div>
         </div>
 
         <div className="flex items-center gap-4">
