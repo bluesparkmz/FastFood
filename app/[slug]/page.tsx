@@ -481,7 +481,7 @@ export default function RestaurantDetailPage() {
 
               {isCartOpen && (
                 <div className="bg-gray-800 p-6 space-y-6 border-t border-gray-700/50">
-                  <div className="space-y-4 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
+                  <div className="space-y-4 max-h-[320px] overflow-y-auto pr-2 custom-scrollbar">
                     {/* Cart Items List */}
                     {Array.from(cart.values()).map((cartItem) => {
                       const product = catalog.find(i => i.id === cartItem.item_id);
