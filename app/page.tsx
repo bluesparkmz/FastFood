@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   ShieldCheck, Star, TrendingUp, Utensils,
   UtensilsCrossed, X, Menu, Bell,
@@ -34,24 +34,46 @@ export default function FastFoodPage() {
   const router = useRouter();
   const {
     restaurants,
+    pagedRestaurants,
     exploreData,
     loading,
+    loadingMore,
     searchQuery,
     setSearchQuery,
     selectedCategory,
     setSelectedCategory,
     selectedProvince,
-    setSelectedProvince
+    setSelectedProvince,
+    loadMore,
+    hasMore
   } = useHome();
 
   const [showMenu, setShowMenu] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loading && !loadingMore) {
+          loadMore();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [hasMore, loading, loadingMore, loadMore]);
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
@@ -197,6 +219,46 @@ export default function FastFoodPage() {
                   <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{res.province} • {res.district}</p>
                 </Link>
               ))}
+            </div>
+          </section>
+        )}
+
+        {/* Explore All Restaurants Section (Infinite Scroll) */}
+        {!searchQuery && !selectedCategory && pagedRestaurants.length > 0 && (
+          <section className="mb-20">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-black text-gray-900 flex items-center gap-2">
+                <UtensilsCrossed className="w-5 h-5 text-orange-500" />
+                Explorar Todos
+              </h3>
+              <span className="px-3 py-1 rounded-full bg-gray-100 text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                {pagedRestaurants.length} Restaurantes
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl">
+              {pagedRestaurants.map((restaurant, index) => (
+                <motion.div
+                  key={`paged-${restaurant.id}-${index}`}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                >
+                  <RestaurantCard restaurant={restaurant} />
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Load More Trigger */}
+            <div ref={loadMoreRef} className="py-10 flex justify-center">
+              {hasMore ? (
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-8 h-8 border-4 border-gray-100 border-t-orange-500 rounded-full animate-spin" />
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Carregando mais...</p>
+                </div>
+              ) : (
+                <p className="text-xs font-bold text-gray-400">Você chegou ao fim da lista ✨</p>
+              )}
             </div>
           </section>
         )}
