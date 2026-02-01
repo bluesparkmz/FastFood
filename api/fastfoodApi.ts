@@ -31,7 +31,7 @@ export const fastfoodApi = {
   },
 
   async getRestaurants(skip = 0, limit = 100): Promise<Restaurant[]> {
-    const response = await api.get('/fastfood/restaurants/', {
+    const response = await api.get('/fastfood/restaurants/explore/', {
       params: { skip, limit }
     });
     return response.data;
