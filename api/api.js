@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const base_url = 'https://api.skyvenda.com';
+export const base_url = 'https://api.skyvenda.com'; // Enforce HTTPS for production
 
 const api = axios.create({
     baseURL: base_url,

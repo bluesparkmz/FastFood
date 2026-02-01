@@ -32,7 +32,7 @@ export const fastfoodApi = {
   },
 
   async getRestaurants(skip = 0, limit = 100, province?: string): Promise<Restaurant[]> {
-    const response = await api.get('/fastfood/restaurants/explore/', {
+    const response = await api.get('/fastfood/restaurants/explore', {
       params: { skip, limit, province }
     });
     return response.data;
@@ -98,7 +98,7 @@ export const fastfoodApi = {
   },
 
   async getExploreFeed(province?: string): Promise<ExploreFeed> {
-    const response = await api.get('/fastfood/explore/', {
+    const response = await api.get('/fastfood/explore', {
       params: { province }
     });
     return response.data;
