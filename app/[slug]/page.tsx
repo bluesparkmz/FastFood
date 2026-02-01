@@ -42,6 +42,7 @@ export default function RestaurantDetailPage() {
   const [showTabModal, setShowTabModal] = useState(false);
   const [newTabName, setNewTabName] = useState('');
   const [newTabPhone, setNewTabPhone] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   // Haversine formula to calculate distance in km
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
@@ -217,6 +218,7 @@ export default function RestaurantDetailPage() {
     }
 
     try {
+      setSubmitting(true);
       const orderData = {
         restaurant_id: Number(restaurant?.id),
         order_type: orderType,
@@ -254,6 +256,7 @@ export default function RestaurantDetailPage() {
         },
       });
     } finally {
+      setSubmitting(false);
       setIsCartOpen(false);
     }
   };
@@ -625,7 +628,7 @@ export default function RestaurantDetailPage() {
                       {/* Final Actions */}
                       <div className="pt-2">
                         <button
-                          onClick={handleCheckout}
+                          onClick={handlePlaceOrder}
                           disabled={submitting}
                           className={cn(
                             "w-full py-4 rounded-2xl font-black text-sm uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3",
