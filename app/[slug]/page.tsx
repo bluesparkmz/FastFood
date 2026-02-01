@@ -472,156 +472,185 @@ export default function RestaurantDetailPage() {
                 </button>
               </div>
 
-              {isCartOpen && (
-                <div className="bg-gray-800 p-6 space-y-6 border-t border-gray-700/50">
-                  <div className="space-y-4 max-h-[320px] overflow-y-auto pr-2 custom-scrollbar">
-                    {/* Cart Items List */}
-                    {Array.from(cart.values()).map((cartItem) => {
-                      const product = catalog.find(i => i.id === cartItem.item_id);
+              <AnimatePresence>
+                {isCartOpen && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="bg-gray-800 p-6 space-y-6 border-t border-gray-700/50">
+                      <div className="space-y-4 max-h-[320px] overflow-y-auto pr-2 custom-scrollbar">
+                        {/* Cart Items List */}
+                        {Array.from(cart.values()).map((cartItem) => {
+                          const product = catalog.find(i => i.id === cartItem.item_id);
 
-                      if (!product) return null;
+                          if (!product) return null;
 
-                      return (
-                        <div key={`product-${cartItem.item_id}`} className="flex items-center justify-between bg-gray-900/50 p-3 rounded-xl border border-white/5">
-                          <div className="flex items-center gap-3">
-                            {product.image ? (
-                              <img
-                                src={getImageUrl(product.image)}
-                                className="w-10 h-10 rounded-lg object-cover bg-gray-700"
-                              />
-                            ) : (
-                              <div className="w-10 h-10 rounded-lg bg-gray-700 flex items-center justify-center">
-                                {product.emoji ? (
-                                  <span className="text-xl">{product.emoji}</span>
+                          return (
+                            <div key={`product-${cartItem.item_id}`} className="flex items-center justify-between bg-gray-900/50 p-3 rounded-xl border border-white/5">
+                              <div className="flex items-center gap-3">
+                                {product.image ? (
+                                  <img
+                                    src={getImageUrl(product.image)}
+                                    className="w-10 h-10 rounded-lg object-cover bg-gray-700"
+                                  />
                                 ) : (
-                                  <span className="text-xs font-bold text-gray-500">IMG</span>
+                                  <div className="w-10 h-10 rounded-lg bg-gray-700 flex items-center justify-center">
+                                    {product.emoji ? (
+                                      <span className="text-xl">{product.emoji}</span>
+                                    ) : (
+                                      <span className="text-xs font-bold text-gray-500">IMG</span>
+                                    )}
+                                  </div>
                                 )}
+                                <div>
+                                  <p className="text-sm font-bold text-white line-clamp-1">{product.name}</p>
+                                  <p className="text-xs text-gray-400">{product.price} MT</p>
+                                </div>
                               </div>
-                            )}
-                            <div>
-                              <p className="text-sm font-bold text-white line-clamp-1">{product.name}</p>
-                              <p className="text-xs text-gray-400">{product.price} MT</p>
+                              <div className="flex items-center gap-2 bg-gray-800 rounded-lg p-1">
+                                <button
+                                  onClick={() => removeFromCart(cartItem.item_id)}
+                                  className="p-1 hover:bg-white/10 rounded transition-colors"
+                                >
+                                  <Minus className="w-3 h-3" />
+                                </button>
+                                <span className="text-xs font-bold w-4 text-center">{cartItem.quantity}</span>
+                                <button
+                                  onClick={() => addToCart(cartItem.item_id, product.price, product.name)}
+                                  className="p-1 hover:bg-white/10 rounded transition-colors"
+                                >
+                                  <Plus className="w-3 h-3" />
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {/* Checkout Options */}
+                      <div className="space-y-4 pt-4 border-t border-gray-700/50">
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="space-y-1">
+                            <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Entrega</label>
+                            <select
+                              value={orderType}
+                              onChange={(e) => setOrderType(e.target.value as any)}
+                              className="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-orange-500 font-medium"
+                            >
+                              <option value="local">Local</option>
+                              <option value="distance">Delivery</option>
+                            </select>
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Pagamento</label>
+                            <select
+                              value={paymentMethod}
+                              onChange={(e) => setPaymentMethod(e.target.value as any)}
+                              className="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-orange-500 font-medium"
+                            >
+                              <option value="cash">Dinheiro</option>
+                              <option value="skywallet">SkyWallet</option>
+                              <option value="pos">Card/POS</option>
+                              <option value="mpesa">M-Pesa</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        {orderType === 'distance' && (
+                          <input
+                            type="text"
+                            placeholder="Endereço de entrega..."
+                            value={deliveryAddress}
+                            onChange={(e) => setDeliveryAddress(e.target.value)}
+                            className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-orange-500 font-medium placeholder:text-gray-600"
+                          />
+                        )}
+
+                        {orderType === 'local' && (
+                          <div className="space-y-3">
+                            {/* Table Selection */}
+                            <div className="space-y-1">
+                              <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Mesa (Opcional)</label>
+                              <select
+                                value={selectedTable || ''}
+                                onChange={(e) => setSelectedTable(e.target.value ? Number(e.target.value) : null)}
+                                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-orange-500 font-medium"
+                              >
+                                <option value="">Nenhuma mesa</option>
+                                {tables.filter(t => t.status === 'available').map(table => (
+                                  <option key={table.id} value={table.id}>
+                                    {table.table_number} ({table.seats} lugares)
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+
+                            {/* Tab Selection */}
+                            <div className="space-y-1">
+                              <div className="flex items-center justify-between">
+                                <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Adicionar à Conta (Opcional)</label>
+                                <button
+                                  onClick={() => setShowTabModal(true)}
+                                  className="text-[10px] font-bold text-orange-500 hover:text-orange-400 uppercase tracking-widest"
+                                >
+                                  + Nova Conta
+                                </button>
+                              </div>
+                              <select
+                                value={selectedTab || ''}
+                                onChange={(e) => setSelectedTab(e.target.value ? Number(e.target.value) : null)}
+                                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-orange-500 font-medium"
+                              >
+                                <option value="">Nenhuma conta</option>
+                                {tabs.map(tab => (
+                                  <option key={tab.id} value={tab.id}>
+                                    {tab.client_name} - {Number(tab.current_balance).toFixed(2)} MT
+                                  </option>
+                                ))}
+                              </select>
+                              {selectedTab && (
+                                <p className="text-[10px] text-orange-400 font-medium">
+                                  O pedido será adicionado à conta. O cliente pagará depois.
+                                </p>
+                              )}
                             </div>
                           </div>
-                          <div className="flex items-center gap-2 bg-gray-800 rounded-lg p-1">
-                            <button
-                              onClick={() => removeFromCart(cartItem.item_id)}
-                              className="p-1 hover:bg-white/10 rounded transition-colors"
-                            >
-                              <Minus className="w-3 h-3" />
-                            </button>
-                            <span className="text-xs font-bold w-4 text-center">{cartItem.quantity}</span>
-                            <button
-                              onClick={() => addToCart(cartItem.item_id, product.price, product.name)}
-                              className="p-1 hover:bg-white/10 rounded transition-colors"
-                            >
-                              <Plus className="w-3 h-3" />
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  {/* Checkout Options */}
-                  <div className="space-y-4 pt-4 border-t border-gray-700/50">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-1">
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Entrega</label>
-                        <select
-                          value={orderType}
-                          onChange={(e) => setOrderType(e.target.value as any)}
-                          className="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-orange-500 font-medium"
-                        >
-                          <option value="local">Local</option>
-                          <option value="distance">Delivery</option>
-                        </select>
+                        )}
                       </div>
-                      <div className="space-y-1">
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Pagamento</label>
-                        <select
-                          value={paymentMethod}
-                          onChange={(e) => setPaymentMethod(e.target.value as any)}
-                          className="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-orange-500 font-medium"
+
+                      {/* Final Actions */}
+                      <div className="pt-2">
+                        <button
+                          onClick={handleCheckout}
+                          disabled={submitting}
+                          className={cn(
+                            "w-full py-4 rounded-2xl font-black text-sm uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3",
+                            submitting
+                              ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+                              : "bg-orange-500 hover:bg-orange-600 text-white shadow-xl shadow-orange-500/20 active:scale-[0.98]"
+                          )}
                         >
-                          <option value="cash">Dinheiro</option>
-                          <option value="skywallet">SkyWallet</option>
-                          <option value="pos">Card/POS</option>
-                          <option value="mpesa">M-Pesa</option>
-                        </select>
+                          {submitting ? (
+                            <>
+                              <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                              <span>Processando...</span>
+                            </>
+                          ) : (
+                            <>
+                              <span>Fazer Pedido</span>
+                              <ShoppingCart className="w-4 h-4" />
+                            </>
+                          )}
+                        </button>
                       </div>
                     </div>
-
-                    {orderType === 'distance' && (
-                      <input
-                        type="text"
-                        placeholder="Endereço de entrega..."
-                        value={deliveryAddress}
-                        onChange={(e) => setDeliveryAddress(e.target.value)}
-                        className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-orange-500 font-medium placeholder:text-gray-600"
-                      />
-                    )}
-
-                    {orderType === 'local' && (
-                      <div className="space-y-3">
-                        {/* Table Selection */}
-                        <div className="space-y-1">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Mesa (Opcional)</label>
-                          <select
-                            value={selectedTable || ''}
-                            onChange={(e) => setSelectedTable(e.target.value ? Number(e.target.value) : null)}
-                            className="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-orange-500 font-medium"
-                          >
-                            <option value="">Nenhuma mesa</option>
-                            {tables.filter(t => t.status === 'available').map(table => (
-                              <option key={table.id} value={table.id}>
-                                {table.table_number} ({table.seats} lugares)
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-
-                        {/* Tab Selection */}
-                        <div className="space-y-1">
-                          <div className="flex items-center justify-between">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Adicionar à Conta (Opcional)</label>
-                            <button
-                              onClick={() => setShowTabModal(true)}
-                              className="text-[10px] font-bold text-orange-500 hover:text-orange-400 uppercase tracking-widest"
-                            >
-                              + Nova Conta
-                            </button>
-                          </div>
-                          <select
-                            value={selectedTab || ''}
-                            onChange={(e) => setSelectedTab(e.target.value ? Number(e.target.value) : null)}
-                            className="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-orange-500 font-medium"
-                          >
-                            <option value="">Pagamento imediato</option>
-                            {tabs.map(tab => (
-                              <option key={tab.id} value={tab.id}>
-                                {tab.client_name} - {Number(tab.current_balance).toFixed(2)} MT
-                              </option>
-                            ))}
-                          </select>
-                          {selectedTab && (
-                            <p className="text-[10px] text-orange-400 font-medium">
-                              O pedido será adicionado à conta. O cliente pagará depois.
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    <button
-                      onClick={handlePlaceOrder}
-                      className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-black py-4 rounded-xl uppercase tracking-widest text-sm shadow-xl shadow-orange-500/20 active:scale-95 transition-all"
-                    >
-                      Confirmar Pedido
-                    </button>
-                  </div>
-                </div>
-              )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </motion.div>
         )}
