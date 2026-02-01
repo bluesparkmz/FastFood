@@ -259,14 +259,7 @@ export default function RestaurantDetailPage() {
   };
 
   if (loading || !restaurant) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" />
-          <p className="text-gray-400 font-medium animate-pulse">Carregando experiências...</p>
-        </div>
-      </div>
-    );
+    return <RestaurantSkeleton />;
   }
 
   const isOpen = restaurant.is_open;
@@ -778,6 +771,65 @@ const ProductCard = ({ item, type, quantity, onAdd, onRemove, isDrink }: any) =>
         </div>
       </div>
     </motion.div>
+  );
+};
+
+// Sub-component: Restaurant Page Skeleton
+const RestaurantSkeleton = () => {
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col animate-pulse">
+      {/* Hero Skeleton */}
+      <div className="relative w-full h-[300px] bg-gray-200">
+        <div className="absolute bottom-10 left-0 w-full px-6">
+          <div className="max-w-7xl mx-auto flex flex-col gap-4">
+            <div className="h-10 bg-gray-300 rounded-2xl w-2/3 md:w-1/3"></div>
+            <div className="flex items-center gap-3">
+              <div className="h-4 bg-gray-300 rounded-lg w-16"></div>
+              <div className="h-4 bg-gray-300 rounded-lg w-24"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Content Skeleton */}
+      <div className="relative z-10 -mt-6 bg-gray-50 rounded-t-[2.5rem] pt-8 px-4 md:px-8">
+        <div className="max-w-7xl mx-auto space-y-8">
+          {/* Search Bar Skeleton */}
+          <div className="h-16 bg-white rounded-[1.5rem] shadow-sm w-full"></div>
+
+          {/* Categories Skeleton */}
+          <div className="flex gap-2 overflow-x-hidden">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="h-10 bg-white rounded-xl w-24 flex-shrink-0 shadow-sm"></div>
+            ))}
+          </div>
+
+          {/* Product Grid Skeleton */}
+          <div className="space-y-12">
+            {[...Array(2)].map((_, g) => (
+              <div key={g} className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div className="h-8 bg-gray-200 rounded-xl w-48"></div>
+                  <div className="h-4 bg-gray-200 rounded-lg w-20"></div>
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="bg-white rounded-[1.5rem] border border-gray-100 shadow-sm p-4 flex gap-4 h-32">
+                      <div className="w-24 md:w-32 bg-gray-100 rounded-xl flex-shrink-0"></div>
+                      <div className="flex-1 space-y-3 py-2">
+                        <div className="h-4 bg-gray-100 rounded w-3/4"></div>
+                        <div className="h-3 bg-gray-100 rounded w-full"></div>
+                        <div className="h-8 bg-gray-50 rounded-xl w-24 mt-auto"></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
