@@ -465,10 +465,10 @@ export default function RestaurantDetailPage() {
                   </div>
                 </div>
                 <button
-                  onClick={(e) => { e.stopPropagation(); setIsCartOpen(true); }}
+                  onClick={(e) => { e.stopPropagation(); setIsCartOpen(!isCartOpen); }}
                   className="bg-white/10 hover:bg-white/20 active:scale-95 transition-all p-3 rounded-xl"
                 >
-                  <ChevronLeft className="w-5 h-5 rotate-90" />
+                  <ChevronLeft className={cn("w-5 h-5 transition-transform duration-300", isCartOpen ? "-rotate-90" : "rotate-90")} />
                 </button>
               </div>
 
