@@ -4,7 +4,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import {
   ShieldCheck, Star, TrendingUp, Utensils,
   UtensilsCrossed, X, Menu, Bell,
-  Navigation, ShoppingBag, Search
+  Navigation, ShoppingBag, Search, QrCode
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -122,7 +122,13 @@ export default function FastFoodPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => router.push('/scan')}
+            className="p-1.5 text-gray-400 hover:text-orange-600 transition-colors"
+          >
+            <QrCode className="w-6 h-6" />
+          </button>
           <button className="relative p-1 text-gray-400 hover:text-gray-900 transition-colors">
             <Bell className="w-6 h-6" />
             <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />

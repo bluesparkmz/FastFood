@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, X, Utensils, Star, ChevronRight, History, TrendingUp, ChevronLeft } from 'lucide-react';
+import { Search, X, Utensils, Star, ChevronRight, History, TrendingUp, ChevronLeft, QrCode } from 'lucide-react';
 import fastfoodApi from '@/api/fastfoodApi';
 import type { Restaurant } from '@/types/fastfood';
 import RestaurantCard from '@/components/fastfood/RestaurantCard';
@@ -48,19 +48,31 @@ export default function SearchPage() {
         <div className="min-h-screen bg-white pb-24">
             {/* Search Header */}
             <div className="sticky top-0 z-50 bg-white px-6 pt-6 pb-6 border-b border-gray-50 space-y-4">
-                <div className="flex items-center gap-3">
-                    <button
-                        onClick={() => router.back()}
-                        className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
-                    >
-                        <ChevronLeft className="w-6 h-6" />
-                    </button>
-                    <div>
-                        <h1 className="text-lg font-black tracking-tight text-gray-900">
-                            Pesquisar <span className="text-orange-600">Comida</span>
-                        </h1>
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Encontre o que deseja</p>
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => router.back()}
+                            className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
+                        >
+                            <ChevronLeft className="w-6 h-6" />
+                        </button>
+                        <div>
+                            <h1 className="text-lg font-black tracking-tight text-gray-900">
+                                Pesquisar <span className="text-orange-600">Comida</span>
+                            </h1>
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Encontre o que deseja</p>
+                        </div>
                     </div>
+
+                    <button
+                        onClick={() => router.push('/scan')}
+                        className="flex flex-col items-center gap-1 group"
+                    >
+                        <div className="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center text-orange-600 group-hover:bg-orange-500 group-hover:text-white transition-all shadow-sm">
+                            <QrCode className="w-6 h-6" />
+                        </div>
+                        <span className="text-[8px] font-black uppercase tracking-[0.1em] text-orange-600">QR Scan</span>
+                    </button>
                 </div>
 
                 <div className="relative group">
