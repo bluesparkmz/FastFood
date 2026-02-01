@@ -134,6 +134,9 @@ export default function FastFoodPage() {
                 <ShieldCheck className="w-5 h-5 text-orange-500" />
                 Sugeridos para Si
               </h3>
+              <Link href="/search" className="text-[10px] font-black text-orange-600 uppercase tracking-widest hover:text-orange-700 transition-colors">
+                Ver mais
+              </Link>
             </div>
             <div className="flex gap-4 overflow-x-auto hide-scrollbar -mx-4 px-4 pb-4">
               {restaurants.map((res: Restaurant) => (
