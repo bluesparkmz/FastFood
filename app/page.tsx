@@ -17,6 +17,8 @@ import Link from 'next/link';
 import PromoBanner from '@/components/fastfood/PromoBanner';
 import { getImageUrl } from '@/utils/imageUtils';
 
+import { useHome } from '@/context/HomeContext';
+
 const FOOD_CATEGORIES = [
   { name: 'Tudo', icon: '🍽️', slug: '' },
   { name: 'Pizza', icon: '🍕', slug: 'Pizza' },
@@ -30,51 +32,26 @@ const FOOD_CATEGORIES = [
 
 export default function FastFoodPage() {
   const router = useRouter();
-  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const [exploreData, setExploreData] = useState<any>(null);
-  const [searchResults, setSearchResults] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
-  const [selectedProvince, setSelectedProvince] = useState<string>('');
+  const {
+    restaurants,
+    exploreData,
+    loading,
+    searchQuery,
+    setSearchQuery,
+    selectedCategory,
+    setSelectedCategory,
+    selectedProvince,
+    setSelectedProvince
+  } = useHome();
+
   const [showMenu, setShowMenu] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    fetchData();
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [searchQuery, selectedCategory, selectedProvince]);
-
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-
-      if (searchQuery) {
-        const results = await fastfoodApi.searchAll(searchQuery);
-        setSearchResults(results);
-        setRestaurants(results.restaurants);
-      } else if (selectedCategory || selectedProvince) {
-        const params: any = {};
-        if (selectedCategory) params.category = selectedCategory;
-        if (selectedProvince) params.province = selectedProvince;
-        const restaurantData = await fastfoodApi.searchRestaurants(params);
-        setRestaurants(restaurantData);
-        setSearchResults(null);
-      } else {
-        const explore = await fastfoodApi.getExploreFeed();
-        setExploreData(explore);
-        setRestaurants(explore.popular_restaurants);
-        setSearchResults(null);
-      }
-    } catch (error: any) {
-      console.error('Error fetching data:', error);
-      toast.error('Erro ao carregar dados');
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
