@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, X, Utensils, Star, ChevronRight, History, TrendingUp } from 'lucide-react';
+import { Search, X, Utensils, Star, ChevronRight, History, TrendingUp, ChevronLeft } from 'lucide-react';
 import fastfoodApi from '@/api/fastfoodApi';
 import type { Restaurant } from '@/types/fastfood';
 import RestaurantCard from '@/components/fastfood/RestaurantCard';
@@ -47,7 +47,22 @@ export default function SearchPage() {
     return (
         <div className="min-h-screen bg-white pb-24">
             {/* Search Header */}
-            <div className="sticky top-0 z-50 bg-white px-6 pt-12 pb-6 border-b border-gray-50">
+            <div className="sticky top-0 z-50 bg-white px-6 pt-6 pb-6 border-b border-gray-50 space-y-4">
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={() => router.back()}
+                        className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
+                    >
+                        <ChevronLeft className="w-6 h-6" />
+                    </button>
+                    <div>
+                        <h1 className="text-lg font-black tracking-tight text-gray-900">
+                            Pesquisar <span className="text-orange-600">Comida</span>
+                        </h1>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Encontre o que deseja</p>
+                    </div>
+                </div>
+
                 <div className="relative group">
                     <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange-500 transition-colors">
                         <Search className="w-5 h-5" />
@@ -55,7 +70,7 @@ export default function SearchPage() {
                     <input
                         autoFocus
                         type="text"
-                        placeholder="Search for restaurants or food..."
+                        placeholder="Pesquisar por restaurantes ou pratos..."
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                         className="w-full bg-gray-50 border-none rounded-2xl py-4 pl-14 pr-12 text-sm font-bold outline-none focus:ring-2 focus:ring-orange-500/10 focus:bg-white transition-all shadow-sm"

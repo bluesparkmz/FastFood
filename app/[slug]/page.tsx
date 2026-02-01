@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import {
   ArrowLeft, Clock, MapPin, Star, ShoppingCart,
   Navigation, ChevronLeft, ChevronRight, CheckCircle,
-  XCircle, Search, Plus, Minus, Info
+  XCircle, Search, Plus, Minus, Info, Share2
 } from 'lucide-react';
 import Image from 'next/image';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
@@ -301,6 +301,34 @@ export default function RestaurantDetailPage() {
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
 
+        {/* Floating Mini Header */}
+        <div className="absolute top-0 left-0 w-full px-6 py-4 flex items-center justify-between z-20">
+          <button
+            onClick={() => router.back()}
+            className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/30 transition-all border border-white/20"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+
+          <button
+            onClick={() => {
+              if (navigator.share) {
+                navigator.share({
+                  title: restaurant.name,
+                  text: `Confira o cardápio do ${restaurant.name} no SkyVenda FastFood!`,
+                  url: window.location.href,
+                }).catch(console.error);
+              } else {
+                navigator.clipboard.writeText(window.location.href);
+                toast.success('Link copiado para a área de transferência!');
+              }
+            }}
+            className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/30 transition-all border border-white/20"
+          >
+            <Share2 className="w-5 h-5" />
+          </button>
+        </div>
+
         <div className="absolute bottom-10 left-0 w-full px-6">
           <div className="max-w-7xl mx-auto flex flex-col gap-2">
             <h1 className="text-3xl font-black text-white tracking-tight">{restaurant.name}</h1>
@@ -430,7 +458,7 @@ export default function RestaurantDetailPage() {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 200, opacity: 0 }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed bottom-6 inset-x-4 md:inset-x-auto md:right-8 md:w-[400px] z-40"
+            className="fixed bottom-20 inset-x-4 md:inset-x-auto md:right-8 md:w-[400px] z-40"
           >
             <div className="bg-gray-900 text-white rounded-[2rem] shadow-2xl shadow-orange-500/20 overflow-hidden border border-gray-800">
               <div className="p-5 flex items-center justify-between cursor-pointer" onClick={() => setIsCartOpen(!isCartOpen)}>

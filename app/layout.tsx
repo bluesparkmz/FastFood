@@ -27,8 +27,7 @@ export default function RootLayout({
   return (
     <html lang="pt">
       <body className="antialiased font-sans">
-        <Header />
-        <main className="pt-20">
+        <main>
           {children}
         </main>
         <BottomNav />

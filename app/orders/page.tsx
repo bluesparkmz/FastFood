@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Package, Clock, UtensilsCrossed, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Package, Clock, UtensilsCrossed, RefreshCw, ChevronLeft } from 'lucide-react';
 import OrderCard from '@/components/fastfood/OrderCard';
 import fastfoodApi from '@/api/fastfoodApi';
 import type { FastFoodOrder } from '@/types/fastfood';
@@ -34,28 +34,34 @@ export default function OrdersPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20 font-sans">
-      {/* Header */}
-      <div className="bg-white/80 backdrop-blur-md sticky top-0 z-20 border-b border-gray-100 mb-6">
-        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+      {/* Standardized Header */}
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100 px-4 py-3">
+        <div className="max-w-3xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
             <button
               onClick={() => router.back()}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors active:scale-95"
+              className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
             >
-              <ArrowLeft className="w-6 h-6 text-gray-800" />
+              <ChevronLeft className="w-6 h-6" />
             </button>
-            <h1 className="text-2xl font-black text-gray-900 tracking-tight">Meus Pedidos</h1>
+            <div>
+              <h1 className="text-lg font-black tracking-tight text-gray-900">
+                Meus <span className="text-orange-600">Pedidos</span>
+              </h1>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Histórico de Compras</p>
+            </div>
           </div>
+
           {!loading && (
             <button
               onClick={fetchOrders}
-              className="p-2 text-orange-500 hover:bg-orange-50 rounded-full transition-colors active:rotate-180 duration-500"
+              className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center text-orange-500 hover:bg-orange-100 transition-all active:rotate-180 duration-500"
             >
               <RefreshCw className="w-5 h-5" />
             </button>
           )}
         </div>
-      </div>
+      </header>
 
       {/* Orders List */}
       <div className="max-w-3xl mx-auto px-4">
