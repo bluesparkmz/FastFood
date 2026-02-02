@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import RestaurantCard from './RestaurantCard';
 
 const SkeletonBase = ({ className }: { className?: string }) => (
     <div className={`animate-pulse bg-gray-200 rounded-xl ${className}`} />
@@ -58,31 +59,7 @@ export const NewRestaurantsSkeleton = () => (
 );
 
 export const RestaurantCardSkeleton = () => (
-    <div className="bg-white rounded-[1.5rem] border border-gray-100 overflow-hidden flex flex-row h-full p-0">
-        <SkeletonBase className="w-32 sm:w-40 md:w-56 lg:w-64 flex-shrink-0 rounded-none" />
-        <div className="p-4 md:p-6 flex-1 flex flex-col justify-between">
-            <div className="space-y-4">
-                <div className="flex justify-between items-start gap-2">
-                    <div className="space-y-2 w-full">
-                        <SkeletonBase className="w-1/4 h-3 rounded-lg" />
-                        <SkeletonBase className="w-3/4 h-6 rounded-lg" />
-                    </div>
-                    <SkeletonBase className="w-12 h-6 rounded-lg flex-shrink-0" />
-                </div>
-                <div className="flex gap-4">
-                    <SkeletonBase className="w-20 h-3 rounded-lg" />
-                    <SkeletonBase className="w-20 h-3 rounded-lg" />
-                </div>
-            </div>
-            <div className="mt-6 pt-4 border-t border-gray-50 flex items-center justify-between">
-                <div className="space-y-1">
-                    <SkeletonBase className="w-16 h-2 rounded-lg" />
-                    <SkeletonBase className="w-24 h-4 rounded-lg" />
-                </div>
-                <SkeletonBase className="w-10 h-10 rounded-xl" />
-            </div>
-        </div>
-    </div>
+    <RestaurantCard isLoading />
 );
 
 export const RestaurantGridSkeleton = () => (
