@@ -4,7 +4,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import {
   ShieldCheck, Star, TrendingUp, Utensils,
   UtensilsCrossed, X, Menu, Bell,
-  Navigation, ShoppingBag, Search, QrCode
+  Navigation, ShoppingBag, Search, QrCode, MapPin
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -93,40 +93,13 @@ export default function FastFoodPage() {
           isScrolled ? "bg-white/90 backdrop-blur-xl border-b border-gray-100 shadow-sm" : "bg-white"
         )}
       >
-        <div className="flex flex-col cursor-pointer" onClick={() => router.push('/')}>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center text-white shadow-lg shadow-orange-200">
-              <Utensils className="w-5 h-5" />
-            </div>
-            <h1 className="text-xl font-black tracking-tighter text-gray-900 line-height-none">
-              Fast<span className="text-orange-600">Food</span>
-            </h1>
+        <div className="flex items-center gap-2 cursor-pointer" onClick={() => router.push('/')}>
+          <div className="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center text-white shadow-lg shadow-orange-200">
+            <Utensils className="w-5 h-5" />
           </div>
-          <div
-            onClick={(e) => { e.stopPropagation(); detectLocation(); }}
-            className="flex items-center gap-1 mt-0.5 ml-1 h-3 group"
-          >
-            {isLocating ? (
-              <>
-                <div className="w-2 h-2 border-2 border-orange-500/20 border-t-orange-500 rounded-full animate-spin" />
-                <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest animate-pulse">Localizando...</span>
-              </>
-            ) : selectedProvince ? (
-              <>
-                <Navigation className="w-2.5 h-2.5 text-orange-500 group-hover:animate-bounce" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 group-hover:text-orange-600 transition-colors">
-                  {selectedProvince}
-                </span>
-              </>
-            ) : (
-              <>
-                <Navigation className="w-2.5 h-2.5 text-gray-300 group-hover:text-orange-500 transition-colors" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-gray-300 group-hover:text-gray-600 transition-colors">
-                  Definir Local
-                </span>
-              </>
-            )}
-          </div>
+          <h1 className="text-xl font-black tracking-tighter text-gray-900">
+            Fast<span className="text-orange-600">Food</span>
+          </h1>
         </div>
 
         <div className="flex items-center gap-3">
@@ -279,6 +252,79 @@ export default function FastFoodPage() {
               </div>
             </section>
           )
+        )}
+
+        {/* Restaurants in Province Section */}
+        {!searchQuery && !selectedCategory && (
+          <section className="mb-12">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-black text-gray-900 flex items-center gap-2">
+                <Navigation className="w-5 h-5 text-orange-500" />
+                {selectedProvince ? `Restaurantes em ${selectedProvince}` : 'Perto de Você'}
+              </h3>
+              {!selectedProvince && !isLocating && (
+                <button
+                  onClick={detectLocation}
+                  className="text-[10px] font-black text-orange-600 uppercase tracking-widest hover:text-orange-700 transition-colors"
+                >
+                  Detectar Local
+                </button>
+              )}
+            </div>
+
+            {isLocating ? (
+              <div className="flex gap-4 overflow-x-auto hide-scrollbar -mx-4 px-4 pb-4">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="flex-shrink-0 w-64 h-48 bg-gray-100 rounded-3xl animate-pulse" />
+                ))}
+              </div>
+            ) : !selectedProvince ? (
+              <div
+                onClick={detectLocation}
+                className="w-full py-12 bg-orange-50 rounded-[2.5rem] border-2 border-dashed border-orange-100 flex flex-col items-center justify-center gap-4 cursor-pointer hover:bg-orange-100/50 transition-all group"
+              >
+                <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-lg shadow-orange-200 group-hover:scale-110 transition-transform">
+                  <MapPin className="w-8 h-8 text-orange-500" />
+                </div>
+                <div className="text-center">
+                  <h4 className="font-black text-gray-900 uppercase tracking-tight">Ver restaurantes próximos</h4>
+                  <p className="text-xs font-bold text-gray-400">Ative seu GPS para encontrar as melhores opções perto de si</p>
+                </div>
+              </div>
+            ) : (
+              <div className="flex gap-4 overflow-x-auto hide-scrollbar -mx-4 px-4 pb-4">
+                {pagedRestaurants.length > 0 ? (
+                  pagedRestaurants.slice(0, 6).map((res: Restaurant) => (
+                    <Link
+                      key={`prov-res-${res.id}`}
+                      href={`/${res.slug}`}
+                      className="flex-shrink-0 w-64 bg-white rounded-3xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-all group"
+                    >
+                      <div className="relative aspect-video rounded-2xl overflow-hidden mb-3 bg-gray-100">
+                        <img
+                          src={getImageUrl(res.cover_image) || '/images/restaurant-placeholder.jpg'}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                        <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-md px-2 py-1 rounded-lg flex items-center gap-1 shadow-sm">
+                          <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                          <span className="text-[10px] font-black text-gray-900">{(Number(res.rating) || 0).toFixed(1)}</span>
+                        </div>
+                      </div>
+                      <h4 className="font-black text-gray-900 truncate">{res.name}</h4>
+                      <div className="flex items-center justify-between mt-1">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{res.district || selectedProvince}</p>
+                        <p className="text-[10px] font-black text-orange-600">{(Number(res.min_delivery_value) || 0).toFixed(0)} MT</p>
+                      </div>
+                    </Link>
+                  ))
+                ) : (
+                  <div className="w-full py-12 text-center text-gray-400 font-bold italic">
+                    Nenhum restaurante encontrado nesta província.
+                  </div>
+                )}
+              </div>
+            )}
+          </section>
         )}
 
         {/* Explore All Restaurants Section (Infinite Scroll) */}
