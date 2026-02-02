@@ -15,6 +15,7 @@ import toast from 'react-hot-toast';
 import { getImageUrl, getMultipleImageUrls, isEmoji } from '@/utils/imageUtils';
 import { cn } from '@/lib/utils';
 import { useHome } from '@/context/HomeContext';
+import { useAuth } from '@/context/AuthContext';
 
 export default function RestaurantDetailPage() {
   const params = useParams();
@@ -37,6 +38,7 @@ export default function RestaurantDetailPage() {
   const [userDistance, setUserDistance] = useState<number | null>(null);
 
   const { restaurants, pagedRestaurants } = useHome();
+  const { isLoggedIn } = useAuth();
 
   // Tab and Table selection (for local orders)
   const [tabs, setTabs] = useState<Tab[]>([]);
@@ -193,7 +195,7 @@ export default function RestaurantDetailPage() {
 
   // Load tabs and tables when orderType is local
   useEffect(() => {
-    if (orderType === 'local' && restaurant?.id) {
+    if (orderType === 'local' && restaurant?.id && isLoggedIn) {
       const loadTabsAndTables = async () => {
         try {
           const [tabsData, tablesData] = await Promise.all([
@@ -208,7 +210,7 @@ export default function RestaurantDetailPage() {
       };
       loadTabsAndTables();
     }
-  }, [orderType, restaurant?.id]);
+  }, [orderType, restaurant?.id, isLoggedIn]);
 
   const handleCreateTab = async () => {
     if (!newTabName.trim()) {
@@ -232,6 +234,12 @@ export default function RestaurantDetailPage() {
   };
 
   const handlePlaceOrder = async () => {
+    if (!isLoggedIn) {
+      const next = encodeURIComponent(window.location.pathname);
+      router.push(`/login?next=${next}`);
+      return;
+    }
+
     if (cart.size === 0) return;
 
     if (orderType === 'distance' && !deliveryAddress.trim()) {

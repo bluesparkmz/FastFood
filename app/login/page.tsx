@@ -6,10 +6,11 @@ import { motion } from 'framer-motion';
 import { Lock, User, CheckCircle, AlertCircle, ArrowRight } from 'lucide-react'; // Using Lucide icons as per project style
 import { cn } from '@/lib/utils';
 import api from '@/api/api';
-// import { useAuth } from '@/contexts/AuthContext'; // If we add AuthContext later
+import { useAuth } from '@/context/AuthContext';
 
 function LoginContent() {
     const router = useRouter();
+    const { login } = useAuth();
     const searchParams = useSearchParams();
     const next = searchParams.get('next') || '/';
 
@@ -53,8 +54,7 @@ function LoginContent() {
             const token = data.access_token;
 
             if (token) {
-                localStorage.setItem('auth_token', token);
-                // Optionally fetch user profile
+                await login(token);
                 router.push(next);
             } else {
                 throw new Error('Token não recebido');

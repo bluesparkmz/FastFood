@@ -4,6 +4,7 @@ import "./globals.css";
 import BottomNav from "@/components/fastfood/BottomNav";
 import Header from "@/components/fastfood/Header";
 import { HomeProvider } from "@/context/HomeContext";
+import { AuthProvider } from "@/context/AuthContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,11 +29,13 @@ export default function RootLayout({
   return (
     <html lang="pt">
       <body className="antialiased font-sans">
-        <HomeProvider>
-          <main>
-            {children}
-          </main>
-        </HomeProvider>
+        <AuthProvider>
+          <HomeProvider>
+            <main>
+              {children}
+            </main>
+          </HomeProvider>
+        </AuthProvider>
         <BottomNav />
       </body>
     </html>

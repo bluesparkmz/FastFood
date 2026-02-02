@@ -203,6 +203,12 @@ export const fastfoodApi = {
       params: { q: query }
     });
     return response.data;
+  },
+
+  // ========== Profile & Auth ==========
+  async getProfile(): Promise<any> {
+    const response = await api.get('/user/profile');
+    return response.data;
   }
 };
 
