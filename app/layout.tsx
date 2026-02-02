@@ -5,6 +5,8 @@ import BottomNav from "@/components/fastfood/BottomNav";
 import Header from "@/components/fastfood/Header";
 import { HomeProvider } from "@/context/HomeContext";
 import { AuthProvider } from "@/context/AuthContext";
+import { WebSocketProvider } from "@/context/WebSocketContext";
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,11 +32,14 @@ export default function RootLayout({
     <html lang="pt">
       <body className="antialiased font-sans">
         <AuthProvider>
-          <HomeProvider>
-            <main>
-              {children}
-            </main>
-          </HomeProvider>
+          <WebSocketProvider>
+            <HomeProvider>
+              <main>
+                {children}
+                <Toaster position="top-center" />
+              </main>
+            </HomeProvider>
+          </WebSocketProvider>
         </AuthProvider>
         <BottomNav />
       </body>

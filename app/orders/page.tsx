@@ -16,6 +16,16 @@ export default function OrdersPage() {
 
   useEffect(() => {
     fetchOrders();
+
+    const handleOrderUpdate = () => {
+      console.log("Received order update, refreshing...");
+      fetchOrders();
+    };
+
+    window.addEventListener('fastfood-order-update', handleOrderUpdate);
+    return () => {
+      window.removeEventListener('fastfood-order-update', handleOrderUpdate);
+    };
   }, []);
 
   const fetchOrders = async () => {
