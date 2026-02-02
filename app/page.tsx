@@ -125,11 +125,29 @@ export default function FastFoodPage() {
           <HeroSkeleton />
         ) : (
           <PromoBanner
-            image="/images/promo_burger_banner.png"
-            title="Grab Our Exclusive Discounts Now!"
-            subtitle="Os melhores sabores da cidade com até 45% de desconto."
-            discount="45%"
-            onAction={() => router.push('/search')}
+            slides={[
+              {
+                image: "/images/promo_burger_banner.png",
+                title: "As Melhores Boladas da Cidade!",
+                subtitle: "Oferta Exclusiva",
+                discount: "45%",
+                onAction: () => router.push('/search')
+              },
+              {
+                image: "/images/promo_burger_banner.png", // Reusing for demo, can be changed later
+                title: "Sexta-feira do Frango!",
+                subtitle: "Promoção Especial",
+                discount: "30%",
+                onAction: () => router.push('/search')
+              },
+              {
+                image: "/images/promo_burger_banner.png",
+                title: "Sobremesas Grátis!",
+                subtitle: "Combo Família",
+                discount: "FREE",
+                onAction: () => router.push('/search')
+              }
+            ]}
           />
         )}
       </section>

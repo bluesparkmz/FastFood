@@ -1,9 +1,11 @@
 'use client';
 
+import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronRight } from 'lucide-react';
 
-interface PromoBannerProps {
+export interface PromoSlide {
     image: string;
     title: string;
     subtitle: string;
@@ -11,65 +13,163 @@ interface PromoBannerProps {
     onAction?: () => void;
 }
 
-export default function PromoBanner({ image, title, subtitle, discount, onAction }: PromoBannerProps) {
+interface PromoBannerProps {
+    slides: PromoSlide[];
+    autoPlayInterval?: number;
+}
+
+export default function PromoBanner({ slides, autoPlayInterval = 5000 }: PromoBannerProps) {
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [direction, setDirection] = useState(0);
+
+    const nextSlide = useCallback(() => {
+        setDirection(1);
+        setCurrentIndex((prev) => (prev + 1) % slides.length);
+    }, [slides.length]);
+
+    const goToSlide = (index: number) => {
+        setDirection(index > currentIndex ? 1 : -1);
+        setCurrentIndex(index);
+    };
+
+    useEffect(() => {
+        if (!slides.length) return;
+        const timer = setInterval(nextSlide, autoPlayInterval);
+        return () => clearInterval(timer);
+    }, [nextSlide, autoPlayInterval, slides.length]);
+
+    if (!slides.length) return null;
+
+    const currentSlide = slides[currentIndex];
+
+    // Animation variants
+    const variants = {
+        enter: (direction: number) => ({
+            x: direction > 0 ? 300 : -300,
+            opacity: 0
+        }),
+        center: {
+            x: 0,
+            opacity: 1
+        },
+        exit: (direction: number) => ({
+            x: direction < 0 ? 300 : -300,
+            opacity: 0
+        })
+    };
+
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="relative w-full h-[200px] rounded-2xl overflow-hidden shadow-lg shadow-orange-500/20"
-        >
-            {/* Orange Gradient Background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-orange-500 via-orange-600 to-orange-700" />
+        <div className="relative w-full h-[200px] group overflow-hidden rounded-[2.5rem]">
+            <AnimatePresence initial={false} custom={direction} mode="wait">
+                <motion.div
+                    key={currentIndex}
+                    custom={direction}
+                    variants={variants}
+                    initial="enter"
+                    animate="center"
+                    exit="exit"
+                    transition={{
+                        x: { type: "spring", stiffness: 300, damping: 30 },
+                        opacity: { duration: 0.2 }
+                    }}
+                    className="absolute inset-0 w-full h-full"
+                >
+                    <div className="relative w-full h-full p-6 flex items-center justify-between overflow-hidden shadow-xl shadow-orange-500/10">
+                        {/* Orange Gradient Background */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600" />
 
-            {/* Pattern Overlay for Texture */}
-            <div className="absolute inset-0 opacity-10">
-                <div className="absolute inset-0" style={{
-                    backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)',
-                    backgroundSize: '32px 32px'
-                }} />
-            </div>
-
-            {/* Content Container */}
-            <div className="relative h-full flex items-center justify-between px-4 md:px-6">
-                {/* Left Side: Text Content */}
-                <div className="flex-1 pr-4 z-10">
-                    <h2 className="text-white text-xl md:text-2xl font-black leading-tight mb-2 drop-shadow-md">
-                        {title}
-                    </h2>
-
-                    <button
-                        onClick={onAction}
-                        className="px-6 py-2.5 bg-gray-900 hover:bg-black text-white rounded-xl font-bold text-sm shadow-xl transition-all active:scale-95"
-                    >
-                        Order Now
-                    </button>
-                </div>
-
-                {/* Right Side: Image & Badge */}
-                <div className="relative flex-shrink-0 w-[140px] h-[140px] md:w-[160px] md:h-[160px]">
-                    {/* Discount Badge */}
-                    {discount && (
-                        <div className="absolute -top-2 -left-2 z-20 w-14 h-14 bg-white rounded-full flex flex-col items-center justify-center shadow-lg">
-                            <span className="text-orange-600 text-xs font-black leading-none">{discount}</span>
-                            <span className="text-orange-600 text-[10px] font-bold leading-none">OFF</span>
+                        {/* Pattern Overlay for Texture */}
+                        <div className="absolute inset-0 opacity-10">
+                            <div className="absolute inset-0" style={{
+                                backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)',
+                                backgroundSize: '32px 32px'
+                            }} />
                         </div>
-                    )}
 
-                    {/* Burger Image */}
-                    <div className="relative w-full h-full">
-                        <Image
-                            src={image}
-                            alt="Promotion"
-                            fill
-                            className="object-contain drop-shadow-2xl"
-                        />
+                        {/* Content Container */}
+                        <div className="relative h-full flex-1 flex flex-col justify-center pr-4 z-10">
+                            <motion.span
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.2 }}
+                                className="text-white/80 text-[10px] font-black uppercase tracking-[0.3em] mb-2"
+                            >
+                                {currentSlide.subtitle}
+                            </motion.span>
+                            <motion.h2
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.3 }}
+                                className="text-white text-2xl md:text-3xl font-black leading-none mb-6 drop-shadow-md tracking-tighter"
+                            >
+                                {currentSlide.title}
+                            </motion.h2>
+
+                            <motion.button
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.4 }}
+                                onClick={currentSlide.onAction}
+                                className="w-fit flex items-center gap-2 px-6 py-3 bg-white hover:bg-orange-50 text-orange-600 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl transition-all active:scale-95 group/btn"
+                            >
+                                Pedir Agora
+                                <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                            </motion.button>
+                        </div>
+
+                        {/* Right Side: Image & Badge */}
+                        <div className="relative flex-shrink-0 w-[160px] h-[160px] md:w-[180px] md:h-[180px]">
+                            {/* Discount Badge */}
+                            {currentSlide.discount && (
+                                <motion.div
+                                    initial={{ scale: 0, rotate: -20 }}
+                                    animate={{ scale: 1, rotate: 0 }}
+                                    transition={{ type: "spring", stiffness: 400, damping: 15, delay: 0.5 }}
+                                    className="absolute -top-1 -right-1 z-20 w-16 h-16 bg-white rounded-full flex flex-col items-center justify-center shadow-2xl border-4 border-orange-500/10"
+                                >
+                                    <span className="text-orange-600 text-sm font-black leading-none">{currentSlide.discount}</span>
+                                    <span className="text-orange-600 text-[10px] font-bold leading-none">OFF</span>
+                                </motion.div>
+                            )}
+
+                            {/* Burger Image */}
+                            <motion.div
+                                initial={{ scale: 0.8, opacity: 0, rotate: 10 }}
+                                animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                                transition={{ type: "spring", stiffness: 200, damping: 20, delay: 0.3 }}
+                                className="relative w-full h-full"
+                            >
+                                <Image
+                                    src={currentSlide.image}
+                                    alt="Promotion"
+                                    fill
+                                    className="object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.3)]"
+                                    priority
+                                />
+                            </motion.div>
+                        </div>
+
+                        {/* Decorative Glow Effects */}
+                        <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-yellow-400/30 rounded-full blur-3xl" />
+                        <div className="absolute -top-10 -right-10 w-48 h-48 bg-white/20 rounded-full blur-3xl" />
                     </div>
-                </div>
-            </div>
+                </motion.div>
+            </AnimatePresence>
 
-            {/* Decorative Glow Effects */}
-            <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-yellow-400/30 rounded-full blur-2xl" />
-            <div className="absolute -top-8 -right-8 w-40 h-40 bg-red-500/20 rounded-full blur-3xl" />
-        </motion.div>
+            {/* dots */}
+            <div className="absolute bottom-4 left-6 flex items-center gap-2 z-20">
+                {slides.map((_, i) => (
+                    <button
+                        key={i}
+                        onClick={() => goToSlide(i)}
+                        className={`h-1.5 rounded-full transition-all duration-300 ${i === currentIndex
+                                ? 'bg-white w-6 shadow-sm'
+                                : 'bg-white/40 w-1.5 hover:bg-white/60'
+                            }`}
+                        aria-label={`Ir para slide ${i + 1}`}
+                    />
+                ))}
+            </div>
+        </div>
     );
 }
