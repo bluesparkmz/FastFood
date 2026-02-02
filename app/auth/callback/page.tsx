@@ -3,26 +3,37 @@
 import { useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { useAuth } from '@/context/AuthContext';
 
 function AuthCallbackContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
 
+    const { login } = useAuth();
+
     useEffect(() => {
-        const token = searchParams.get('token');
-        const next = searchParams.get('next') || '/';
+        const handleAuth = async () => {
+            const token = searchParams.get('token');
+            const next = searchParams.get('next') || '/';
 
-        if (token) {
-            // Store token consistent with api/api.js
-            localStorage.setItem('auth_token', token);
+            if (token) {
+                try {
+                    // Use context login to update state and fetch profile
+                    await login(token);
+                    // Redirect to next page after successful login state update
+                    router.replace(next);
+                } catch (error) {
+                    console.error('Login error in callback:', error);
+                    router.replace('/login?error=auth_failed');
+                }
+            } else {
+                // If no token, redirect back to login
+                router.replace('/login?error=missing_token');
+            }
+        };
 
-            // Redirect to next page
-            router.replace(next);
-        } else {
-            // If no token, redirect back to login
-            router.replace('/login?error=missing_token');
-        }
-    }, [searchParams, router]);
+        handleAuth();
+    }, [searchParams, router, login]);
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
