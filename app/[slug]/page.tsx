@@ -14,6 +14,7 @@ import type { Restaurant, FastFoodOrder, RestaurantTable, Tab, CatalogProduct } 
 import toast from 'react-hot-toast';
 import { getImageUrl, getMultipleImageUrls, isEmoji } from '@/utils/imageUtils';
 import { cn } from '@/lib/utils';
+import { useHome } from '@/context/HomeContext';
 
 export default function RestaurantDetailPage() {
   const params = useParams();
@@ -25,6 +26,7 @@ export default function RestaurantDetailPage() {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [catalog, setCatalog] = useState<CatalogProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingCatalog, setLoadingCatalog] = useState(true);
   const [cart, setCart] = useState<Map<string, any>>(new Map());
   const [orderType, setOrderType] = useState<'local' | 'distance'>('local');
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'skywallet' | 'pos' | 'mpesa'>('cash');
@@ -33,6 +35,8 @@ export default function RestaurantDetailPage() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [userDistance, setUserDistance] = useState<number | null>(null);
+
+  const { restaurants, pagedRestaurants } = useHome();
 
   // Tab and Table selection (for local orders)
   const [tabs, setTabs] = useState<Tab[]>([]);
@@ -86,10 +90,27 @@ export default function RestaurantDetailPage() {
 
   const fetchRestaurant = async () => {
     try {
-      setLoading(true);
-      const restaurantData = await fastfoodApi.getRestaurantBySlug(restaurantSlug);
-      setRestaurant(restaurantData);
+      // Try to find in context first
+      const contextRestaurant = [...restaurants, ...pagedRestaurants].find(r => r.slug === restaurantSlug);
 
+      if (contextRestaurant) {
+        setRestaurant(contextRestaurant);
+        setLoading(false);
+      } else {
+        setLoading(true);
+      }
+
+      setLoadingCatalog(true);
+
+      // If we don't have it in context, fetch it
+      let restaurantData = contextRestaurant;
+      if (!restaurantData) {
+        restaurantData = await fastfoodApi.getRestaurantBySlug(restaurantSlug);
+        setRestaurant(restaurantData);
+        setLoading(false);
+      }
+
+      // Fetch catalog
       const catalogData = await fastfoodApi.getCatalog(restaurantData.id);
       setCatalog(catalogData);
 
@@ -97,7 +118,7 @@ export default function RestaurantDetailPage() {
         // Find unique categories
         const categories = Array.from(new Set(catalogData.map(i => i.category).filter(Boolean)));
         if (categories.length > 0) {
-          setActiveCategory(categories[0] as string);
+          setActiveCategory('all');
         }
       }
     } catch (error: any) {
@@ -105,6 +126,7 @@ export default function RestaurantDetailPage() {
       toast.error('Erro ao carregar restaurante');
     } finally {
       setLoading(false);
+      setLoadingCatalog(false);
     }
   };
 
@@ -387,41 +409,66 @@ export default function RestaurantDetailPage() {
 
           {/* Menu Sections */}
           <div className="space-y-12 pb-24">
-            {displayCategories.map((categoryName) => {
-              const itemsInCategory = catalog.filter(item =>
-                (categoryName === "Geral" && !item.category) || (item.category === categoryName)
-              );
-              const filteredItems = itemsInCategory.filter(item =>
-                item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase()))
-              );
-
-              if (filteredItems.length === 0) return null;
-
-              return (
-                <section key={categoryName} id={categoryName} className="scroll-mt-32">
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-black text-gray-900 tracking-tight">{categoryName}</h2>
-                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{filteredItems.length} ITENS</span>
+            {loadingCatalog ? (
+              <div className="space-y-12">
+                {[...Array(2)].map((_, g) => (
+                  <div key={g} className="space-y-6">
+                    <div className="flex items-center justify-between">
+                      <div className="h-8 bg-gray-200 rounded-xl w-48 animate-pulse"></div>
+                      <div className="h-4 bg-gray-200 rounded-lg w-20 animate-pulse"></div>
+                    </div>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                      {[...Array(4)].map((_, i) => (
+                        <div key={i} className="bg-white rounded-[1.5rem] border border-gray-100 shadow-sm p-4 flex gap-4 h-32 animate-pulse">
+                          <div className="w-24 md:w-32 bg-gray-100 rounded-xl flex-shrink-0"></div>
+                          <div className="flex-1 space-y-3 py-2">
+                            <div className="h-4 bg-gray-100 rounded w-3/4"></div>
+                            <div className="h-3 bg-gray-100 rounded w-full"></div>
+                            <div className="h-8 bg-gray-50 rounded-xl w-24 mt-auto"></div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
+                ))}
+              </div>
+            ) : (
+              displayCategories.map((categoryName) => {
+                const itemsInCategory = catalog.filter(item =>
+                  (categoryName === "Geral" && !item.category) || (item.category === categoryName)
+                );
+                const filteredItems = itemsInCategory.filter(item =>
+                  item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                  (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase()))
+                );
 
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    {filteredItems.map((item) => (
-                      <ProductCard
-                        key={item.id}
-                        item={item}
-                        quantity={getCartQuantity(item.id)}
-                        onAdd={() => addToCart(item.id, item.price, item.name)}
-                        onRemove={() => removeFromCart(item.id)}
-                      />
-                    ))}
-                  </div>
-                </section>
-              );
-            })}
+                if (filteredItems.length === 0) return null;
+
+                return (
+                  <section key={categoryName} id={categoryName} className="scroll-mt-32">
+                    <div className="flex items-center justify-between mb-6">
+                      <h2 className="text-2xl font-black text-gray-900 tracking-tight">{categoryName}</h2>
+                      <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{filteredItems.length} ITENS</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                      {filteredItems.map((item) => (
+                        <ProductCard
+                          key={item.id}
+                          item={item}
+                          quantity={getCartQuantity(item.id)}
+                          onAdd={() => addToCart(item.id, item.price, item.name)}
+                          onRemove={() => removeFromCart(item.id)}
+                        />
+                      ))}
+                    </div>
+                  </section>
+                );
+              })
+            )}
 
             {/* Empty State for Catalog */}
-            {catalog.length === 0 && !loading && (
+            {!loadingCatalog && catalog.length === 0 && !loading && (
               <div className="text-center py-20 bg-white rounded-[2.5rem] shadow-soft border border-dashed border-gray-200">
                 <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
                   <ShoppingCart className="w-10 h-10 text-gray-300" />
@@ -432,7 +479,7 @@ export default function RestaurantDetailPage() {
             )}
 
             {/* Empty State for Search */}
-            {searchTerm &&
+            {searchTerm && !loadingCatalog &&
               catalog.filter(i =>
                 i.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 (i.description && i.description.toLowerCase().includes(searchTerm.toLowerCase()))
