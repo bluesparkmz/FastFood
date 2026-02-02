@@ -17,37 +17,33 @@ interface RestaurantCardProps {
 export default function RestaurantCard({ restaurant, isLoading }: RestaurantCardProps) {
   if (isLoading || !restaurant) {
     return (
-      <div className="bg-white rounded-[1.5rem] border border-gray-100 overflow-hidden flex flex-row h-full animate-pulse">
-        {/* Skeleton Image */}
-        <div className="relative w-32 sm:w-40 md:w-56 lg:w-64 flex-shrink-0 bg-gray-100" />
+      <div className="bg-white rounded-[1.5rem] border border-gray-100 overflow-hidden flex flex-row h-[160px] md:h-[200px] animate-pulse">
+        {/* Cover Image Skeleton */}
+        <div className="w-32 sm:w-40 md:w-56 lg:w-64 flex-shrink-0 bg-gray-200" />
 
-        {/* Skeleton Info */}
-        <div className="p-4 md:p-6 flex-1 flex flex-col justify-between overflow-hidden">
+        {/* Restaurant Info Skeleton */}
+        <div className="p-4 md:p-6 flex-1 flex flex-col justify-between">
           <div>
             <div className="flex justify-between items-start mb-2 gap-2">
               <div className="space-y-2 flex-1">
-                <div className="h-2 w-16 bg-gray-100 rounded-full" />
-                <div className="h-6 w-3/4 bg-gray-100 rounded-lg" />
+                <div className="h-2 w-16 bg-gray-200 rounded-full" />
+                <div className="h-6 w-3/4 bg-gray-200 rounded-lg" />
               </div>
-              <div className="w-10 h-6 bg-gray-100 rounded-lg" />
+              <div className="w-12 h-6 bg-gray-200 rounded-lg" />
             </div>
             <div className="flex gap-4 mt-4">
-              <div className="h-3 w-20 bg-gray-100 rounded-full" />
-              <div className="h-3 w-20 bg-gray-100 rounded-full" />
+              <div className="h-3 w-20 bg-gray-200 rounded-full" />
+              <div className="h-3 w-20 bg-gray-200 rounded-full" />
             </div>
           </div>
           <div className="mt-6 pt-4 border-t border-gray-50 flex items-center justify-between">
-            <div className="space-y-1">
-              <div className="h-2 w-12 bg-gray-100 rounded-full" />
-              <div className="h-4 w-20 bg-gray-100 rounded-lg" />
-            </div>
-            <div className="w-10 h-10 bg-gray-100 rounded-xl" />
+            <div className="h-8 w-24 bg-gray-200 rounded-lg" />
+            <div className="w-10 h-10 bg-gray-200 rounded-xl" />
           </div>
         </div>
       </div>
     );
   }
-
   const defaultImage = '/images/restaurant-placeholder.svg';
   const imageUrl = getImageUrl(restaurant.cover_image) || defaultImage;
 
