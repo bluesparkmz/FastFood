@@ -16,6 +16,12 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import PromoBanner from '@/components/fastfood/PromoBanner';
 import { getImageUrl } from '@/utils/imageUtils';
+import {
+  CategorySkeleton,
+  SuggestedSkeleton,
+  NewRestaurantsSkeleton,
+  RestaurantGridSkeleton
+} from '@/components/fastfood/Skeletons';
 
 import { useHome } from '@/context/HomeContext';
 
@@ -151,31 +157,35 @@ export default function FastFoodPage() {
       </section>
 
       {/* Modern Categories Grid */}
-      <section className="px-6 py-8 overflow-x-auto no-scrollbar">
-        <div className="flex items-start gap-6 min-w-max">
-          {FOOD_CATEGORIES.map((cat) => (
-            <button
-              key={cat.name}
-              onClick={() => setSelectedCategory(cat.slug)}
-              className="flex flex-col items-center gap-3 group"
-            >
-              <div className={cn(
-                "w-16 h-16 rounded-2xl flex items-center justify-center text-2xl transition-all duration-300 shadow-sm",
-                selectedCategory === cat.slug
-                  ? "bg-orange-500 text-white scale-110 shadow-lg shadow-orange-200"
-                  : "bg-white text-gray-400 group-hover:bg-gray-100 group-hover:text-gray-900"
-              )}>
-                {cat.icon}
-              </div>
-              <span className={cn(
-                "text-[10px] font-black uppercase tracking-widest transition-colors",
-                selectedCategory === cat.slug ? "text-orange-600" : "text-gray-400"
-              )}>
-                {cat.name}
-              </span>
-            </button>
-          ))}
-        </div>
+      <section className="overflow-x-auto no-scrollbar">
+        {loading ? (
+          <CategorySkeleton />
+        ) : (
+          <div className="flex items-start gap-6 min-w-max px-6 py-8">
+            {FOOD_CATEGORIES.map((cat) => (
+              <button
+                key={cat.name}
+                onClick={() => setSelectedCategory(cat.slug)}
+                className="flex flex-col items-center gap-3 group"
+              >
+                <div className={cn(
+                  "w-16 h-16 rounded-2xl flex items-center justify-center text-2xl transition-all duration-300 shadow-sm",
+                  selectedCategory === cat.slug
+                    ? "bg-orange-500 text-white scale-110 shadow-lg shadow-orange-200"
+                    : "bg-white text-gray-400 group-hover:bg-gray-100 group-hover:text-gray-900"
+                )}>
+                  {cat.icon}
+                </div>
+                <span className={cn(
+                  "text-[10px] font-black uppercase tracking-widest transition-colors",
+                  selectedCategory === cat.slug ? "text-orange-600" : "text-gray-400"
+                )}>
+                  {cat.name}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Main Content Area */}
@@ -184,118 +194,130 @@ export default function FastFoodPage() {
 
 
         {/* Popular / Suggested Restaurants Section */}
-        {!searchQuery && !selectedCategory && restaurants.length > 0 && (
-          <section className="mb-12">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-black text-gray-900 flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-orange-500" />
-                Sugeridos para Si
-              </h3>
-              <Link href="/suggested" className="text-[10px] font-black text-orange-600 uppercase tracking-widest hover:text-orange-700 transition-colors">
-                Ver mais
-              </Link>
-            </div>
-            <div className="flex gap-4 overflow-x-auto hide-scrollbar -mx-4 px-4 pb-4">
-              {restaurants.map((res: Restaurant) => (
-                <Link
-                  key={`sug-res-${res.id}`}
-                  href={`/${res.slug}`}
-                  className="flex-shrink-0 w-72 bg-white rounded-[2rem] p-3 border border-gray-100 shadow-sm hover:shadow-md transition-all group"
-                >
-                  <div className="relative aspect-[16/10] rounded-2xl overflow-hidden mb-3 bg-gray-100">
-                    <img
-                      src={getImageUrl(res.cover_image) || '/images/restaurant-placeholder.jpg'}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-2 py-1 rounded-lg flex items-center gap-1 shadow-sm">
-                      <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
-                      <span className="text-[10px] font-black text-gray-900">{(Number(res.rating) || 0).toFixed(1)}</span>
-                    </div>
-                  </div>
-                  <div className="px-1">
-                    <h4 className="font-black text-gray-900 truncate text-base">{res.name}</h4>
-                    <div className="flex items-center justify-between mt-1">
-                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{res.category || 'Restaurante'}</p>
-                      <p className="text-[10px] font-black text-orange-600">{(Number(res.min_delivery_value) || 0).toFixed(0)} MT mín.</p>
-                    </div>
-                  </div>
+        {!searchQuery && !selectedCategory && (loading || restaurants.length > 0) && (
+          loading ? (
+            <SuggestedSkeleton />
+          ) : (
+            <section className="mb-12">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-black text-gray-900 flex items-center gap-2">
+                  <ShieldCheck className="w-5 h-5 text-orange-500" />
+                  Sugeridos para Si
+                </h3>
+                <Link href="/suggested" className="text-[10px] font-black text-orange-600 uppercase tracking-widest hover:text-orange-700 transition-colors">
+                  Ver mais
                 </Link>
-              ))}
-            </div>
-          </section>
+              </div>
+              <div className="flex gap-4 overflow-x-auto hide-scrollbar -mx-4 px-4 pb-4">
+                {restaurants.map((res: Restaurant) => (
+                  <Link
+                    key={`sug-res-${res.id}`}
+                    href={`/${res.slug}`}
+                    className="flex-shrink-0 w-72 bg-white rounded-[2rem] p-3 border border-gray-100 shadow-sm hover:shadow-md transition-all group"
+                  >
+                    <div className="relative aspect-[16/10] rounded-2xl overflow-hidden mb-3 bg-gray-100">
+                      <img
+                        src={getImageUrl(res.cover_image) || '/images/restaurant-placeholder.jpg'}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-2 py-1 rounded-lg flex items-center gap-1 shadow-sm">
+                        <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                        <span className="text-[10px] font-black text-gray-900">{(Number(res.rating) || 0).toFixed(1)}</span>
+                      </div>
+                    </div>
+                    <div className="px-1">
+                      <h4 className="font-black text-gray-900 truncate text-base">{res.name}</h4>
+                      <div className="flex items-center justify-between mt-1">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{res.category || 'Restaurante'}</p>
+                        <p className="text-[10px] font-black text-orange-600">{(Number(res.min_delivery_value) || 0).toFixed(0)} MT mín.</p>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )
         )}
 
         {/* Popular Restaurants Section (Alternative view or hidden if using suggested row) */}
-        {!searchQuery && !selectedCategory && exploreData?.new_restaurants?.length > 0 && (
-          <section className="mb-12">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-black text-gray-900 flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-emerald-500" />
-                Novos na Plataforma
-              </h3>
-            </div>
-            <div className="flex gap-4 overflow-x-auto hide-scrollbar -mx-4 px-4 pb-4">
-              {exploreData.new_restaurants.map((res: Restaurant) => (
-                <Link
-                  key={`new-res-${res.id}`}
-                  href={`/${res.slug}`}
-                  className="flex-shrink-0 w-64 bg-white rounded-3xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-all group"
-                >
-                  <div className="relative aspect-video rounded-2xl overflow-hidden mb-3 bg-gray-100">
-                    <img
-                      src={getImageUrl(res.cover_image) || '/images/restaurant-placeholder.jpg'}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-md px-2 py-1 rounded-lg text-[10px] font-black text-gray-900">
-                      NEW
+        {!searchQuery && !selectedCategory && (loading || exploreData?.new_restaurants?.length > 0) && (
+          loading ? (
+            <NewRestaurantsSkeleton />
+          ) : (
+            <section className="mb-12">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-black text-gray-900 flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-emerald-500" />
+                  Novos na Plataforma
+                </h3>
+              </div>
+              <div className="flex gap-4 overflow-x-auto hide-scrollbar -mx-4 px-4 pb-4">
+                {exploreData.new_restaurants.map((res: Restaurant) => (
+                  <Link
+                    key={`new-res-${res.id}`}
+                    href={`/${res.slug}`}
+                    className="flex-shrink-0 w-64 bg-white rounded-3xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-all group"
+                  >
+                    <div className="relative aspect-video rounded-2xl overflow-hidden mb-3 bg-gray-100">
+                      <img
+                        src={getImageUrl(res.cover_image) || '/images/restaurant-placeholder.jpg'}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                      <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-md px-2 py-1 rounded-lg text-[10px] font-black text-gray-900">
+                        NEW
+                      </div>
                     </div>
-                  </div>
-                  <h4 className="font-black text-gray-900 truncate">{res.name}</h4>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{res.province} • {res.district}</p>
-                </Link>
-              ))}
-            </div>
-          </section>
+                    <h4 className="font-black text-gray-900 truncate">{res.name}</h4>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{res.province} • {res.district}</p>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )
         )}
 
         {/* Explore All Restaurants Section (Infinite Scroll) */}
-        {!searchQuery && !selectedCategory && pagedRestaurants.length > 0 && (
-          <section className="mb-20">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-black text-gray-900 flex items-center gap-2">
-                <UtensilsCrossed className="w-5 h-5 text-orange-500" />
-                Explorar Todos
-              </h3>
-              <span className="px-3 py-1 rounded-full bg-gray-100 text-[10px] font-black text-gray-500 uppercase tracking-widest">
-                {pagedRestaurants.length} Restaurantes
-              </span>
-            </div>
+        {!searchQuery && !selectedCategory && (loading || pagedRestaurants.length > 0) && (
+          loading ? (
+            <RestaurantGridSkeleton />
+          ) : (
+            <section className="mb-20">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-black text-gray-900 flex items-center gap-2">
+                  <UtensilsCrossed className="w-5 h-5 text-orange-500" />
+                  Explorar Todos
+                </h3>
+                <span className="px-3 py-1 rounded-full bg-gray-100 text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                  {pagedRestaurants.length} Restaurantes
+                </span>
+              </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl">
-              {pagedRestaurants.map((restaurant, index) => (
-                <motion.div
-                  key={`paged-${restaurant.id}-${index}`}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                >
-                  <RestaurantCard restaurant={restaurant} />
-                </motion.div>
-              ))}
-            </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl">
+                {pagedRestaurants.map((restaurant, index) => (
+                  <motion.div
+                    key={`paged-${restaurant.id}-${index}`}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                  >
+                    <RestaurantCard restaurant={restaurant} />
+                  </motion.div>
+                ))}
+              </div>
 
-            {/* Load More Trigger */}
-            <div ref={loadMoreRef} className="py-10 flex justify-center">
-              {hasMore ? (
-                <div className="flex flex-col items-center gap-2">
-                  <div className="w-8 h-8 border-4 border-gray-100 border-t-orange-500 rounded-full animate-spin" />
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Carregando mais...</p>
-                </div>
-              ) : (
-                <p className="text-xs font-bold text-gray-400">Você chegou ao fim da lista ✨</p>
-              )}
-            </div>
-          </section>
+              {/* Load More Trigger */}
+              <div ref={loadMoreRef} className="py-10 flex justify-center">
+                {hasMore ? (
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="w-8 h-8 border-4 border-gray-100 border-t-orange-500 rounded-full animate-spin" />
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Carregando mais...</p>
+                  </div>
+                ) : (
+                  <p className="text-xs font-bold text-gray-400">Você chegou ao fim da lista ✨</p>
+                )}
+              </div>
+            </section>
+          )
         )}
 
         {/* Restaurants Section (Visible during search/category filter) */}
