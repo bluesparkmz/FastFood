@@ -51,6 +51,8 @@ export default function FastFoodPage() {
     setSelectedCategory,
     selectedProvince,
     setSelectedProvince,
+    selectedDistrict,
+    districtRestaurants,
     loadMore,
     hasMore,
     isLocating,
@@ -270,6 +272,50 @@ export default function FastFoodPage() {
               </div>
             </section>
           )
+        )}
+
+        {/* Restaurants in District Section */}
+        {!searchQuery && !selectedCategory && selectedDistrict && (
+          <section className="mb-12">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-black text-gray-900 flex items-center gap-2">
+                <MapPin className="w-5 h-5 text-red-500" />
+                Restaurantes em {selectedDistrict}
+              </h3>
+            </div>
+
+            <div className="flex gap-4 overflow-x-auto hide-scrollbar -mx-4 px-4 pb-4">
+              {districtRestaurants.length > 0 ? (
+                districtRestaurants.slice(0, 6).map((res: Restaurant) => (
+                  <Link
+                    key={`dist-res-${res.id}`}
+                    href={`/${res.slug}`}
+                    className="flex-shrink-0 w-64 bg-white rounded-3xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-all group"
+                  >
+                    <div className="relative aspect-video rounded-2xl overflow-hidden mb-3 bg-gray-100">
+                      <img
+                        src={getImageUrl(res.cover_image) || '/images/restaurant-placeholder.jpg'}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                      <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-md px-2 py-1 rounded-lg flex items-center gap-1 shadow-sm">
+                        <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                        <span className="text-[10px] font-black text-gray-900">{(Number(res.rating) || 0).toFixed(1)}</span>
+                      </div>
+                    </div>
+                    <h4 className="font-black text-gray-900 truncate">{res.name}</h4>
+                    <div className="flex items-center justify-between mt-1">
+                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{res.neighborhood || res.district || selectedDistrict}</p>
+                      <p className="text-[10px] font-black text-orange-600">{(Number(res.min_delivery_value) || 0).toFixed(0)} MT</p>
+                    </div>
+                  </Link>
+                ))
+              ) : (
+                <div className="w-full py-8 text-center text-gray-400 font-bold italic bg-gray-50 rounded-3xl border border-dashed border-gray-200">
+                  Nenhum restaurante encontrado em {selectedDistrict}.
+                </div>
+              )}
+            </div>
+          </section>
         )}
 
         {/* Restaurants in Province Section */}

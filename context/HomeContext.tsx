@@ -17,6 +17,9 @@ interface HomeContextType {
     setSelectedCategory: (category: string) => void;
     selectedProvince: string;
     setSelectedProvince: (province: string) => void;
+    selectedDistrict: string;
+    setSelectedDistrict: (district: string) => void;
+    districtRestaurants: Restaurant[];
     refreshData: () => Promise<void>;
     loadMore: () => Promise<void>;
     hasMore: boolean;
@@ -35,6 +38,8 @@ export function HomeProvider({ children }: { children: React.ReactNode }) {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
     const [selectedProvince, setSelectedProvince] = useState('');
+    const [selectedDistrict, setSelectedDistrict] = useState('');
+    const [districtRestaurants, setDistrictRestaurants] = useState<Restaurant[]>([]);
     const [isLocating, setIsLocating] = useState(false);
     const [hasLoadedInitially, setHasLoadedInitially] = useState(false);
     const [page, setPage] = useState(0);
@@ -101,9 +106,18 @@ export function HomeProvider({ children }: { children: React.ReactNode }) {
             const data = await res.json();
             if (data.address) {
                 const province = normalizeProvince(data.address);
+                const district = data.address.city || data.address.town || data.address.village || data.address.suburb || data.address.municipality || '';
+
                 if (province) {
                     setSelectedProvince(province);
-                    toast.success(`Localização detectada: ${province}`, { id: 'loc-detect' });
+                }
+                if (district) {
+                    setSelectedDistrict(district);
+                }
+
+                if (province || district) {
+                    const locationMsg = district ? `${district}, ${province}` : province;
+                    toast.success(`Localização detectada: ${locationMsg}`, { id: 'loc-detect' });
                 }
             }
         } catch (error) {
@@ -135,13 +149,15 @@ export function HomeProvider({ children }: { children: React.ReactNode }) {
                 setRestaurants(restaurantData);
                 setPagedRestaurants([]);
             } else {
-                const [explore, allRes] = await Promise.all([
+                const [explore, allRes, distRes] = await Promise.all([
                     fastfoodApi.getExploreFeed(selectedProvince || undefined),
-                    fastfoodApi.getRestaurants(0, LIMIT, selectedProvince || undefined)
+                    fastfoodApi.getRestaurants(0, LIMIT, selectedProvince || undefined),
+                    selectedDistrict ? fastfoodApi.searchRestaurants({ district: selectedDistrict }) : Promise.resolve([])
                 ]);
                 setExploreData(explore);
                 setRestaurants(explore.popular_restaurants);
                 setPagedRestaurants(allRes);
+                setDistrictRestaurants(distRes);
                 if (allRes.length < LIMIT) setHasMore(false);
             }
             setHasLoadedInitially(true);
@@ -204,6 +220,9 @@ export function HomeProvider({ children }: { children: React.ReactNode }) {
             setSelectedCategory,
             selectedProvince,
             setSelectedProvince,
+            selectedDistrict,
+            setSelectedDistrict,
+            districtRestaurants,
             refreshData,
             loadMore,
             hasMore,
