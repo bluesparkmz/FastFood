@@ -16,7 +16,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
     const [isConnected, setIsConnected] = useState(false);
     const [lastMessage, setLastMessage] = useState<any | null>(null);
     const wsRef = useRef<WebSocket | null>(null);
-    const reconnectTimeoutRef = useRef<NodeJS.Timeout>();
+    const reconnectTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
     const connect = useCallback(() => {
         const token = localStorage.getItem('auth_token');
@@ -63,18 +63,92 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
 
                 // Handle specific notification types
                 if (data.type === 'notification' || data.type === 'notification_new') {
-                    // Check if it's an order update
-                    if (data.data?.type?.startsWith('order_') || data.data?.notification_type?.startsWith('order_')) {
-                        const msg = data.data?.message || data.message;
+                    const notifData = data.data || {};
+                    const notificationType = notifData.notification_type || notifData.type || data.tipo || '';
+                    const referenceType = notifData.reference_type || '';
+                    
+                    // Check if it's an order-related notification
+                    const isOrderNotification = 
+                        notificationType.startsWith('order_') || 
+                        referenceType === 'FastFoodOrder' ||
+                        notifData.reference_type === 'FastFoodOrder';
+
+                    if (isOrderNotification) {
+                        const msg = notifData.message || data.message || '';
+                        const orderId = notifData.reference_id || data.order_id || notifData.order_id;
+                        
+                        // Show toast notification
                         if (msg) {
                             toast(msg, {
                                 icon: '🔔',
                                 style: { borderRadius: '24px', background: '#333', color: '#fff' }
                             });
                         }
-                        window.dispatchEvent(new CustomEvent('fastfood-order-update', { detail: data }));
+
+                        // Dispatch order update event with enriched data
+                        window.dispatchEvent(new CustomEvent('fastfood-order-update', { 
+                            detail: {
+                                ...data,
+                                order_id: orderId,
+                                notification_type: notificationType,
+                                reference_type: referenceType
+                            }
+                        }));
+
+                        // Dispatch specific event for new orders
+                        if (notificationType === 'order_created' || notificationType === 'order_new') {
+                            window.dispatchEvent(new CustomEvent('fastfood-new-order', { 
+                                detail: {
+                                    ...data,
+                                    order_id: orderId,
+                                    notification_type: notificationType
+                                }
+                            }));
+                        }
+
+                        // Dispatch specific events for status updates
+                        if (notificationType.includes('order_accepted') || notificationType === 'order_preparing') {
+                            window.dispatchEvent(new CustomEvent('fastfood-order-status-update', { 
+                                detail: {
+                                    ...data,
+                                    order_id: orderId,
+                                    new_status: 'preparing',
+                                    notification_type: notificationType
+                                }
+                            }));
+                        } else if (notificationType.includes('order_ready')) {
+                            window.dispatchEvent(new CustomEvent('fastfood-order-status-update', { 
+                                detail: {
+                                    ...data,
+                                    order_id: orderId,
+                                    new_status: 'ready',
+                                    notification_type: notificationType
+                                }
+                            }));
+                        } else if (notificationType.includes('order_delivering')) {
+                            window.dispatchEvent(new CustomEvent('fastfood-order-status-update', { 
+                                detail: {
+                                    ...data,
+                                    order_id: orderId,
+                                    new_status: 'delivering',
+                                    notification_type: notificationType
+                                }
+                            }));
+                        } else if (notificationType.includes('order_completed')) {
+                            window.dispatchEvent(new CustomEvent('fastfood-order-status-update', { 
+                                detail: {
+                                    ...data,
+                                    order_id: orderId,
+                                    new_status: 'completed',
+                                    notification_type: notificationType
+                                }
+                            }));
+                        }
                     }
                 }
+
+                // Also handle generic new-notification event for compatibility
+                window.dispatchEvent(new CustomEvent('new-notification', { detail: data }));
             } catch (e) {
                 console.error('Error parsing WS message:', e);
             }

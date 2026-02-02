@@ -17,14 +17,58 @@ export default function OrdersPage() {
   useEffect(() => {
     fetchOrders();
 
-    const handleOrderUpdate = () => {
-      console.log("Received order update, refreshing...");
+    const handleOrderUpdate = (event: any) => {
+      const data = event.detail;
+      console.log("Received order update, refreshing...", data);
+      
+      // Refresh orders list
+      fetchOrders();
+    };
+
+    const handleOrderStatusUpdate = (event: any) => {
+      const data = event.detail;
+      const orderId = data.order_id || data.data?.reference_id || data.data?.order_id;
+      const newStatus = data.new_status || data.data?.notification_type?.replace('order_', '');
+      
+      console.log("Received order status update", { orderId, newStatus });
+      
+      // Update the order in the list if we have the data
+      if (orderId && newStatus) {
+        setOrders(prevOrders => {
+          const orderIndex = prevOrders.findIndex(o => o.id === Number(orderId));
+          if (orderIndex !== -1) {
+            const updatedOrders = [...prevOrders];
+            updatedOrders[orderIndex] = {
+              ...updatedOrders[orderIndex],
+              status: newStatus
+            };
+            return updatedOrders;
+          }
+          // If order not found, refresh to get updated list
+          fetchOrders();
+          return prevOrders;
+        });
+      } else {
+        // Fallback: refresh if we can't identify the order
+        fetchOrders();
+      }
+    };
+
+    const handleNewOrder = (event: any) => {
+      console.log("Received new order notification, refreshing...", event.detail);
       fetchOrders();
     };
 
     window.addEventListener('fastfood-order-update', handleOrderUpdate);
+    window.addEventListener('fastfood-order-status-update', handleOrderStatusUpdate);
+    window.addEventListener('fastfood-new-order', handleNewOrder);
+    window.addEventListener('new-notification', handleOrderUpdate);
+
     return () => {
       window.removeEventListener('fastfood-order-update', handleOrderUpdate);
+      window.removeEventListener('fastfood-order-status-update', handleOrderStatusUpdate);
+      window.removeEventListener('fastfood-new-order', handleNewOrder);
+      window.removeEventListener('new-notification', handleOrderUpdate);
     };
   }, []);
 

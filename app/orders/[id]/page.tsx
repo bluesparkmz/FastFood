@@ -35,23 +35,60 @@ export default function OrderDetailsPage() {
 
     // Listen for real-time notifications to refresh the status
     useEffect(() => {
-        const handleNewNotification = (event: any) => {
+        const orderId = Number(params.id);
+
+        const handleOrderStatusUpdate = (event: any) => {
             const data = event.detail;
-            const orderId = Number(params.id);
-
-            // Notification type check (e.g., order_accepted, order_ready, order_delivering, order_completed)
-            const isStatusUpdate = data?.tipo?.startsWith('order_') || data?.type?.startsWith('order_');
-            const matchesOrder = Number(data?.data?.order_id) === orderId || Number(data?.order_id) === orderId;
-
-            if (isStatusUpdate && matchesOrder) {
-                console.log('Real-time: Order status update received, refreshing details...');
-                fetchOrderDetails(String(orderId));
+            const updateOrderId = data.order_id || data.data?.reference_id || data.data?.order_id;
+            
+            if (Number(updateOrderId) === orderId) {
+                console.log('Real-time: Order status update received, refreshing details...', data);
+                fetchOrderDetails(String(orderId), false); // Silent refresh
+                
+                // Show toast notification
+                const newStatus = data.new_status || data.data?.notification_type?.replace('order_', '');
+                if (newStatus) {
+                    toast.success(`Status atualizado: ${newStatus}`, {
+                        duration: 3000
+                    });
+                }
             }
         };
 
-        window.addEventListener('new-notification' as any, handleNewNotification);
+        const handleOrderUpdate = (event: any) => {
+            const data = event.detail;
+            const updateOrderId = data.order_id || data.data?.reference_id || data.data?.order_id;
+            
+            if (Number(updateOrderId) === orderId) {
+                console.log('Real-time: Order update received, refreshing details...', data);
+                fetchOrderDetails(String(orderId), false); // Silent refresh
+            }
+        };
+
+        const handleGenericNotification = (event: any) => {
+            const data = event.detail;
+            const notificationType = data.data?.notification_type || data.data?.type || data.tipo || '';
+            const updateOrderId = data.order_id || data.data?.reference_id || data.data?.order_id;
+            
+            // Check if it's an order-related notification for this order
+            const isOrderNotification = 
+                notificationType?.startsWith('order_') || 
+                data.data?.reference_type === 'FastFoodOrder';
+            
+            if (isOrderNotification && Number(updateOrderId) === orderId) {
+                console.log('Real-time: Order notification received, refreshing details...', data);
+                fetchOrderDetails(String(orderId), false); // Silent refresh
+            }
+        };
+
+        window.addEventListener('fastfood-order-status-update' as any, handleOrderStatusUpdate);
+        window.addEventListener('fastfood-order-update' as any, handleOrderUpdate);
+        window.addEventListener('new-notification' as any, handleGenericNotification);
+
         return () => {
-            window.removeEventListener('new-notification' as any, handleNewNotification);
+            window.removeEventListener('fastfood-order-status-update' as any, handleOrderStatusUpdate);
+            window.removeEventListener('fastfood-order-update' as any, handleOrderUpdate);
+            window.removeEventListener('new-notification' as any, handleGenericNotification);
         };
     }, [params.id]);
 
