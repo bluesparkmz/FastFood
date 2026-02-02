@@ -542,20 +542,22 @@ export default function RestaurantDetailPage() {
                           return (
                             <div key={`product-${cartItem.item_id}`} className="flex items-center justify-between bg-gray-900/50 p-3 rounded-xl border border-white/5">
                               <div className="flex items-center gap-3">
-                                {product.image ? (
-                                  <img
-                                    src={getImageUrl(product.image)}
-                                    className="w-10 h-10 rounded-lg object-cover bg-gray-700"
-                                  />
-                                ) : (
-                                  <div className="w-10 h-10 rounded-lg bg-gray-700 flex items-center justify-center">
-                                    {product.emoji ? (
-                                      <span className="text-xl">{product.emoji}</span>
-                                    ) : (
-                                      <span className="text-xs font-bold text-gray-500">IMG</span>
-                                    )}
-                                  </div>
-                                )}
+                                {(() => {
+                                  const isEmojiImage = product.image && isEmoji(product.image);
+                                  const displayEmoji = isEmojiImage ? product.image : (product.emoji || (product.category?.toLowerCase() === 'drinks' ? '🥤' : '🍔'));
+                                  const imageUrl = (!isEmojiImage && product.image) ? getImageUrl(product.image) : null;
+
+                                  return imageUrl ? (
+                                    <img
+                                      src={imageUrl}
+                                      className="w-10 h-10 rounded-lg object-cover bg-gray-700"
+                                    />
+                                  ) : (
+                                    <div className="w-10 h-10 rounded-lg bg-gray-700 flex items-center justify-center">
+                                      <span className="text-xl">{displayEmoji}</span>
+                                    </div>
+                                  );
+                                })()}
                                 <div>
                                   <p className="text-sm font-bold text-white line-clamp-1">{product.name}</p>
                                   <p className="text-xs text-gray-400">{product.price} MT</p>
