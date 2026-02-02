@@ -18,6 +18,21 @@ export const CategorySkeleton = () => (
     </div>
 );
 
+export const HeroSkeleton = () => (
+    <div className="px-4 py-3">
+        <div className="w-full h-[200px] rounded-2xl bg-orange-100 animate-pulse relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-200 to-orange-300 opacity-50" />
+            <div className="relative h-full flex items-center justify-between px-6">
+                <div className="flex-1 space-y-4">
+                    <div className="h-8 w-3/4 bg-white/50 rounded-lg" />
+                    <div className="h-10 w-32 bg-gray-200/50 rounded-xl" />
+                </div>
+                <div className="w-[140px] h-[140px] bg-white/30 rounded-full" />
+            </div>
+        </div>
+    </div>
+);
+
 export const SuggestedSkeleton = () => (
     <div className="mb-12">
         <div className="flex items-center justify-between mb-6 px-4">

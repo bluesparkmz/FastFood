@@ -18,6 +18,7 @@ import PromoBanner from '@/components/fastfood/PromoBanner';
 import { getImageUrl } from '@/utils/imageUtils';
 import {
   CategorySkeleton,
+  HeroSkeleton,
   SuggestedSkeleton,
   NewRestaurantsSkeleton,
   RestaurantGridSkeleton
@@ -147,13 +148,17 @@ export default function FastFoodPage() {
 
       {/* Hero / Promo Section */}
       <section className="px-4 py-3">
-        <PromoBanner
-          image="/images/promo_burger_banner.png"
-          title="Grab Our Exclusive Discounts Now!"
-          subtitle="Os melhores sabores da cidade com até 45% de desconto."
-          discount="45%"
-          onAction={() => router.push('/search')}
-        />
+        {loading ? (
+          <HeroSkeleton />
+        ) : (
+          <PromoBanner
+            image="/images/promo_burger_banner.png"
+            title="Grab Our Exclusive Discounts Now!"
+            subtitle="Os melhores sabores da cidade com até 45% de desconto."
+            discount="45%"
+            onAction={() => router.push('/search')}
+          />
+        )}
       </section>
 
       {/* Modern Categories Grid */}
