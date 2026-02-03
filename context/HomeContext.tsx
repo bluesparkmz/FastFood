@@ -3,7 +3,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import fastfoodApi from '@/api/fastfoodApi';
 import type { Restaurant } from '@/types/fastfood';
-import toast from 'react-hot-toast';
 
 interface HomeContextType {
     restaurants: Restaurant[];
@@ -117,7 +116,7 @@ export function HomeProvider({ children }: { children: React.ReactNode }) {
 
                 if (province || district) {
                     const locationMsg = district ? `${district}, ${province}` : province;
-                    toast.success(`Localização detectada: ${locationMsg}`, { id: 'loc-detect' });
+                    console.log(`Localização detectada: ${locationMsg}`);
                 }
             }
         } catch (error) {
@@ -163,7 +162,6 @@ export function HomeProvider({ children }: { children: React.ReactNode }) {
             setHasLoadedInitially(true);
         } catch (error: any) {
             console.error('Error fetching home data:', error);
-            toast.error('Erro ao carregar dados');
         } finally {
             setLoading(false);
         }

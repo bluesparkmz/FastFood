@@ -6,7 +6,6 @@ import { ArrowLeft, MapPin, Loader2, Navigation, AlertCircle, ChevronLeft, Setti
 import RestaurantCard from '@/components/fastfood/RestaurantCard';
 import fastfoodApi from '@/api/fastfoodApi';
 import type { Restaurant } from '@/types/fastfood';
-import toast from 'react-hot-toast';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -67,7 +66,6 @@ export default function NearbyRestaurantsPage() {
     if (!navigator.geolocation) {
       setError('Geolocalização não é suportada pelo seu navegador');
       setGettingLocation(false);
-      toast.error('Geolocalização não disponível');
       return;
     }
     navigator.geolocation.getCurrentPosition(
@@ -78,7 +76,6 @@ export default function NearbyRestaurantsPage() {
         };
         setLocation(newLocation);
         setGettingLocation(false);
-        toast.success('Localização obtida com sucesso!');
         searchNearbyRestaurants(newLocation);
       },
       (error) => {
@@ -90,7 +87,6 @@ export default function NearbyRestaurantsPage() {
         }
         setError(errorMessage);
         setGettingLocation(false);
-        toast.error(errorMessage);
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
@@ -111,12 +107,8 @@ export default function NearbyRestaurantsPage() {
         .filter((r): r is any => r !== null && r.distance <= radius)
         .sort((a, b) => a.distance - b.distance);
       setRestaurants(restaurantsWithDistance as any);
-      if (restaurantsWithDistance.length === 0) {
-        toast.error(`Nenhum restaurante encontrado num raio de ${radius}km`);
-      }
     } catch (error: any) {
       console.error('Error searching restaurants:', error);
-      toast.error('Erro ao buscar restaurantes próximos');
     } finally {
       setLoading(false);
     }
