@@ -23,7 +23,6 @@ export default function SettingsPage() {
         <div className="min-h-screen bg-gray-50 pb-20">
             <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-gray-100 px-6 py-4">
                 <h1 className="text-lg font-black tracking-tight text-gray-900">Conta</h1>
-                <p className="text-xs font-bold uppercase tracking-widest text-gray-400">SkyVenda MZ</p>
             </header>
 
             <div className="max-w-md mx-auto px-4 py-6 space-y-6">

@@ -24,10 +24,7 @@ export default function SuggestedPage() {
                 >
                     <ArrowLeft className="w-5 h-5" />
                 </button>
-                <div>
-                    <h1 className="text-lg font-black text-gray-900 tracking-tight">Sugeridos</h1>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Para o seu paladar</p>
-                </div>
+                <h1 className="text-lg font-black text-gray-900 tracking-tight">Sugeridos</h1>
             </header>
 
             <main className="max-w-7xl mx-auto px-4 py-8">

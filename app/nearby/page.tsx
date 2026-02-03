@@ -134,12 +134,9 @@ export default function NearbyRestaurantsPage() {
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
-          <div>
-            <h1 className="text-lg font-black tracking-tight text-gray-900">
-              Perto de <span className="text-orange-600">Mim</span>
-            </h1>
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Localização Automática</p>
-          </div>
+          <h1 className="text-lg font-black tracking-tight text-gray-900">
+            Perto de <span className="text-orange-600">Mim</span>
+          </h1>
         </div>
 
         <button className="p-2 rounded-xl bg-gray-50 text-gray-400">

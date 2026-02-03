@@ -98,12 +98,9 @@ export default function OrdersPage() {
             >
               <ChevronLeft className="w-6 h-6" />
             </button>
-            <div>
-              <h1 className="text-lg font-black tracking-tight text-gray-900">
-                Meus <span className="text-orange-600">Pedidos</span>
-              </h1>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Histórico de Compras</p>
-            </div>
+            <h1 className="text-lg font-black tracking-tight text-gray-900">
+              Meus <span className="text-orange-600">Pedidos</span>
+            </h1>
           </div>
 
           {!loading && (
