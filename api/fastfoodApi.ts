@@ -27,7 +27,7 @@ import type {
 export const fastfoodApi = {
   // ========== Restaurants ==========
   async createRestaurant(data: RestaurantCreate): Promise<Restaurant> {
-    const response = await api.post('/fastfood/restaurants/', data);
+    const response = await api.post('/fastfood/restaurants', data);
     return response.data;
   },
 
@@ -54,7 +54,7 @@ export const fastfoodApi = {
   },
 
   async searchRestaurants(params: RestaurantSearchParams): Promise<Restaurant[]> {
-    const response = await api.get('/fastfood/restaurants/search/', { params });
+    const response = await api.get('/fastfood/restaurants/search', { params });
     return response.data;
   },
 
@@ -93,7 +93,7 @@ export const fastfoodApi = {
 
   // ========== Orders ==========
   async createOrder(data: OrderCreate): Promise<FastFoodOrder> {
-    const response = await api.post('/fastfood/orders/', data);
+    const response = await api.post('/fastfood/orders', data);
     return response.data;
   },
 
@@ -105,12 +105,12 @@ export const fastfoodApi = {
   },
 
   async getUserOrders(): Promise<FastFoodOrder[]> {
-    const response = await api.get('/fastfood/orders/');
+    const response = await api.get('/fastfood/orders');
     return response.data;
   },
 
   async getRestaurantOrders(restaurantId: number): Promise<FastFoodOrder[]> {
-    const response = await api.get(`/fastfood/restaurants/${restaurantId}/orders/`);
+    const response = await api.get(`/fastfood/restaurants/${restaurantId}/orders`);
     return response.data;
   },
 
