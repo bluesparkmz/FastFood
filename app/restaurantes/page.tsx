@@ -165,18 +165,19 @@ export default async function RestaurantesPage() {
             </section>
 
             {/* Province Navigation */}
-            <section className="py-8 px-4 border-b border-gray-100 bg-white sticky top-0 z-10">
+            {/* Province Navigation */}
+            <section className="py-4 px-4 border-b border-gray-100 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 sticky top-0 z-20 shadow-sm transition-all">
                 <div className="max-w-6xl mx-auto">
-                    <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
-                        <MapPin className="w-4 h-4" />
-                        Explorar por Província
-                    </h2>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
+                        <div className="flex-shrink-0 flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-wider mr-2 border-r border-gray-200 pr-3">
+                            <MapPin className="w-3.5 h-3.5" />
+                            Províncias
+                        </div>
                         {PROVINCES.map((province) => (
                             <Link
                                 key={province.slug}
                                 href={`/restaurantes/${province.slug}`}
-                                className="px-4 py-2 bg-gray-50 hover:bg-orange-50 text-gray-700 hover:text-orange-600 rounded-full text-sm font-medium transition-all hover:shadow-md border border-gray-100 hover:border-orange-200"
+                                className="flex-shrink-0 px-4 py-1.5 bg-gray-50 hover:bg-orange-50 text-gray-700 hover:text-orange-600 rounded-full text-sm font-medium transition-all hover:shadow-sm border border-gray-100 hover:border-orange-200 whitespace-nowrap"
                             >
                                 {province.name}
                             </Link>
