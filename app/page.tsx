@@ -23,8 +23,8 @@ import {
   NewRestaurantsSkeleton,
   RestaurantGridSkeleton
 } from '@/components/fastfood/Skeletons';
-
 import { useHome } from '@/context/HomeContext';
+import { useAuth } from '@/context/AuthContext';
 
 const FOOD_CATEGORIES = [
   { name: 'Tudo', icon: '🍽️', slug: '' },
@@ -39,6 +39,7 @@ const FOOD_CATEGORIES = [
 
 export default function FastFoodPage() {
   const router = useRouter();
+  const { isLoggedIn } = useAuth();
   const {
     restaurants,
     pagedRestaurants,
@@ -520,24 +521,42 @@ export default function FastFoodPage() {
               </div>
 
               <div className="flex-1 overflow-y-auto p-8 space-y-3">
-                {[
-                  { icon: Navigation, label: 'Perto de Mim', path: '/nearby', color: 'orange' },
-                  { icon: ShoppingBag, label: 'Meus Pedidos', path: '/orders', color: 'red' },
-                  // { icon: LayoutDashboard, label: 'Gerenciar Vendas', path: '/restaurant-orders', color: 'orange' },
-                  // { icon: TrendingUp, label: 'Estatísticas', path: '/sales', color: 'emerald' },
-                  // { icon: Settings, label: 'Configurações', path: '/settings', color: 'gray' },
-                ].map((item, i) => (
-                  <button
-                    key={i}
-                    onClick={() => { router.push(item.path); setShowMenu(false); }}
-                    className="w-full flex items-center gap-4 p-5 rounded-3xl bg-gray-50 hover:bg-gray-100 transition-colors text-left group"
-                  >
-                    <div className={cn("w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform")}>
-                      <item.icon className="w-6 h-6 text-gray-700" />
-                    </div>
-                    <span className="font-black text-sm text-gray-900 uppercase tracking-widest">{item.label}</span>
-                  </button>
-                ))}
+                {/* Perto de Mim */}
+                <button
+                  onClick={() => { router.push('/nearby'); setShowMenu(false); }}
+                  className="w-full flex items-center gap-4 p-5 rounded-3xl bg-gray-50 hover:bg-gray-100 transition-colors text-left group"
+                >
+                  <div className={cn("w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform")}>
+                    <Navigation className="w-6 h-6 text-gray-700" />
+                  </div>
+                  <span className="font-black text-sm text-gray-900 uppercase tracking-widest">Perto de Mim</span>
+                </button>
+
+                {/* Meus Pedidos / Fazer login */}
+                <button
+                  onClick={() => {
+                    if (isLoggedIn) {
+                      router.push('/orders');
+                    } else {
+                      router.push('/login');
+                    }
+                    setShowMenu(false);
+                  }}
+                  className="w-full flex items-center gap-4 p-5 rounded-3xl bg-gray-50 hover:bg-gray-100 transition-colors text-left group"
+                >
+                  <div className={cn("w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform")}>
+                    <ShoppingBag className="w-6 h-6 text-gray-700" />
+                  </div>
+                  <span className="font-black text-sm text-gray-900 uppercase tracking-widest">
+                    {isLoggedIn ? 'Meus Pedidos' : 'Fazer login'}
+                  </span>
+                </button>
+
+                {/* 
+                // { icon: LayoutDashboard, label: 'Gerenciar Vendas', path: '/restaurant-orders', color: 'orange' },
+                // { icon: TrendingUp, label: 'Estatísticas', path: '/sales', color: 'emerald' },
+                // { icon: Settings, label: 'Configurações', path: '/settings', color: 'gray' },
+                */}
               </div>
 
               <div className="p-8 border-t border-gray-50">
