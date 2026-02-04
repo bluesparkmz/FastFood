@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Home, Search, ShoppingBag, User } from 'lucide-react';
+import { Home, Search, ShoppingBag, User, Bell } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
@@ -14,6 +14,7 @@ const BottomNav = () => {
         { icon: Home, label: 'Início', path: '/' },
         { icon: Search, label: 'Busca', path: '/search' },
         { icon: ShoppingBag, label: 'Pedidos', path: '/orders' },
+        { icon: Bell, label: 'Alertas', path: '/notifications' },
         { icon: User, label: 'Perfil', path: '/profile' },
     ];
 
