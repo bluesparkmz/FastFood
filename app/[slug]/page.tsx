@@ -37,6 +37,7 @@ export default function RestaurantDetailPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isSearchMode, setIsSearchMode] = useState(false);
   const [userDistance, setUserDistance] = useState<number | null>(null);
+  const [heroImageIndex, setHeroImageIndex] = useState(0);
 
   const { restaurants, pagedRestaurants } = useHome();
   const { isLoggedIn } = useAuth();
@@ -327,8 +328,26 @@ export default function RestaurantDetailPage() {
 
   const isOpen = restaurant.is_open;
   const coverImage = restaurant.cover_image ? getImageUrl(restaurant.cover_image) : null;
+  const extraImages = getMultipleImageUrls((restaurant as any).images);
+  const heroImages = [coverImage, ...extraImages].filter((x): x is string => !!x);
+  const activeHeroImage = heroImages.length > 0 ? heroImages[heroImageIndex % heroImages.length] : null;
   const categoriesList = Array.from(new Set(catalog.map(i => i.category).filter(Boolean) as string[]));
   const hasItemsWithoutCategory = catalog.some(i => !i.category);
+
+  useEffect(() => {
+    setHeroImageIndex(0);
+  }, [restaurant.id]);
+
+  useEffect(() => {
+    if (isSearchMode) return;
+    if (heroImages.length <= 1) return;
+
+    const id = window.setInterval(() => {
+      setHeroImageIndex((prev) => (prev + 1) % heroImages.length);
+    }, 4000);
+
+    return () => window.clearInterval(id);
+  }, [heroImages.length, isSearchMode]);
 
   const displayCategories = [...categoriesList];
   if (hasItemsWithoutCategory) {
@@ -346,18 +365,28 @@ export default function RestaurantDetailPage() {
       {/* Hero Section - Streamlined */}
       {!isSearchMode && (
         <div className="relative w-full h-[300px] overflow-hidden">
-          {coverImage ? (
-            <Image
-              src={coverImage}
-              alt={restaurant.name}
-              fill
-              className="object-cover"
-            />
+          {activeHeroImage ? (
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeHeroImage}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.6 }}
+                className="absolute inset-0"
+              >
+                <Image
+                  src={activeHeroImage}
+                  alt={restaurant.name}
+                  fill
+                  className="object-cover"
+                />
+              </motion.div>
+            </AnimatePresence>
           ) : (
             <div className="w-full h-full bg-orange-500" />
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
 
         {/* Floating Mini Header */}
         <div className="absolute top-0 left-0 w-full px-6 py-4 flex items-center justify-between z-20">
