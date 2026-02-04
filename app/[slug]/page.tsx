@@ -38,6 +38,8 @@ export default function RestaurantDetailPage() {
   const [isSearchMode, setIsSearchMode] = useState(false);
   const [userDistance, setUserDistance] = useState<number | null>(null);
   const [heroImageIndex, setHeroImageIndex] = useState(0);
+  const [showShareDialog, setShowShareDialog] = useState(false);
+  const [copying, setCopying] = useState(false);
 
   const { restaurants, pagedRestaurants } = useHome();
   const { isLoggedIn } = useAuth();
@@ -409,18 +411,7 @@ export default function RestaurantDetailPage() {
                 </button>
 
                 <button
-                  onClick={() => {
-                    if (navigator.share) {
-                      navigator.share({
-                        title: restaurant.name,
-                        text: `Confira o cardápio do ${restaurant.name} no SkyVenda FastFood!`,
-                        url: window.location.href,
-                      }).catch(console.error);
-                    } else {
-                      navigator.clipboard.writeText(window.location.href);
-                      toast.success('Link copiado para a área de transferência!');
-                    }
-                  }}
+                  onClick={() => setShowShareDialog(true)}
                   className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/30 transition-all border border-white/20"
                 >
                   <Share2 className="w-5 h-5" />
@@ -895,6 +886,121 @@ export default function RestaurantDetailPage() {
           </div>
         </div>
       )}
+
+      {/* Share Dialog - FastFood Dark Style */}
+      <AnimatePresence>
+        {showShareDialog && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 240, damping: 24 }}
+              className="w-full max-w-md rounded-3xl bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 border border-gray-800 shadow-[0_40px_80px_rgba(0,0,0,0.75)] overflow-hidden"
+            >
+              <div className="px-6 py-5 flex items-center justify-between border-b border-gray-800">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.25em] text-gray-500">
+                    Partilhar Restaurante
+                  </p>
+                  <h2 className="text-lg font-black text-white mt-1 line-clamp-1">
+                    {restaurant.name}
+                  </h2>
+                </div>
+                <button
+                  onClick={() => setShowShareDialog(false)}
+                  className="w-9 h-9 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-all"
+                >
+                  <XCircle className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="px-6 pt-5 pb-2 space-y-4">
+                {/* URL + Slug + Copy */}
+                <div className="bg-gray-900/80 border border-gray-800 rounded-2xl p-4 flex items-start gap-3">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] font-black uppercase tracking-[0.25em] text-gray-500 mb-1">
+                      Link direto
+                    </p>
+                    <p className="text-xs font-mono text-gray-300 break-all">
+                      {typeof window !== 'undefined'
+                        ? `${window.location.origin}/${restaurant.slug}`
+                        : `/${restaurant.slug}`}
+                    </p>
+                  </div>
+                  <button
+                    onClick={async () => {
+                      if (typeof window === 'undefined') return;
+                      const url = `${window.location.origin}/${restaurant.slug}`;
+                      try {
+                        setCopying(true);
+                        await navigator.clipboard.writeText(url);
+                        toast.success('Link copiado!');
+                      } catch {
+                        toast.error('Não foi possível copiar o link.');
+                      } finally {
+                        setCopying(false);
+                      }
+                    }}
+                    className="ml-2 px-3 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-[11px] font-black uppercase tracking-[0.2em] text-white flex items-center gap-1.5 active:scale-95 transition-all"
+                  >
+                    {copying ? 'Copiando...' : 'Copiar'}
+                  </button>
+                </div>
+
+                {/* QR Code */}
+                <div className="bg-gray-900/80 border border-gray-800 rounded-2xl p-4 flex flex-col items-center gap-3">
+                  <p className="text-[10px] font-black uppercase tracking-[0.25em] text-gray-500">
+                    QR Code do Restaurante
+                  </p>
+                  <div className="bg-white rounded-3xl p-3 shadow-[0_20px_40px_rgba(0,0,0,0.45)]">
+                    {typeof window !== 'undefined' && (
+                      // Usando serviço externo simples para gerar QR code a partir da URL
+                      <img
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
+                          `${window.location.origin}/${restaurant.slug}`
+                        )}`}
+                        alt="QR Code do restaurante"
+                        className="w-44 h-44 object-contain"
+                      />
+                    )}
+                  </div>
+                  <p className="text-[11px] text-gray-400 text-center max-w-xs">
+                    Aponte a câmara para abrir o restaurante diretamente no FastFood.
+                  </p>
+                </div>
+
+                {/* Social icons */}
+                <div className="pt-1 pb-4">
+                  <p className="text-[10px] font-black uppercase tracking-[0.25em] text-gray-500 mb-3 text-center">
+                    Partilhar em
+                  </p>
+                  <div className="flex items-center justify-center gap-4">
+                    {/* Apenas ícones estilizados; a lógica de share completa pode ser adicionada depois */}
+                    <button className="w-10 h-10 rounded-2xl bg-[#1877F2] flex items-center justify-center text-white shadow-lg shadow-[#1877F2]/40 active:scale-95 transition-transform">
+                      <span className="text-sm font-black">f</span>
+                    </button>
+                    <button className="w-10 h-10 rounded-2xl bg-[#25D366] flex items-center justify-center text-white shadow-lg shadow-[#25D366]/40 active:scale-95 transition-transform">
+                      <span className="text-base font-black">🟢</span>
+                    </button>
+                    <button className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#F58529] via-[#DD2A7B] to-[#8134AF] flex items-center justify-center text-white shadow-lg shadow-[#DD2A7B]/40 active:scale-95 transition-transform">
+                      <span className="text-sm font-black">IG</span>
+                    </button>
+                    <button className="w-10 h-10 rounded-2xl bg-black flex items-center justify-center text-white shadow-lg shadow-black/40 active:scale-95 transition-transform">
+                      <span className="text-sm font-black">X</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
     </div>
   );
