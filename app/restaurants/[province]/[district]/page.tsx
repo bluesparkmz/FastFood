@@ -276,7 +276,7 @@ export default async function DistrictPage({
                         <ChevronRight className="w-4 h-4" />
                         <Link href="/restaurantes" className="hover:text-white transition-colors">Restaurantes</Link>
                         <ChevronRight className="w-4 h-4" />
-                        <Link href={`/restaurantes/${provinceSlug}`} className="hover:text-white transition-colors">
+                        <Link href={`/restaurants/${provinceSlug}`} className="hover:text-white transition-colors">
                             {provinceData.name}
                         </Link>
                         <ChevronRight className="w-4 h-4" />
@@ -297,7 +297,7 @@ export default async function DistrictPage({
             <section className="py-6 px-4 border-b border-gray-100 bg-white">
                 <div className="max-w-6xl mx-auto flex items-center gap-4">
                     <Link
-                        href={`/restaurantes/${provinceSlug}`}
+                        href={`/restaurants/${provinceSlug}`}
                         className="flex items-center gap-2 text-gray-500 hover:text-orange-600 transition-colors text-sm font-medium"
                     >
                         <ArrowLeft className="w-4 h-4" />
@@ -333,7 +333,7 @@ export default async function DistrictPage({
                                 Ainda não há restaurantes cadastrados neste distrito.
                             </p>
                             <Link
-                                href={`/restaurantes/${provinceSlug}`}
+                                href={`/restaurants/${provinceSlug}`}
                                 className="inline-flex items-center gap-2 text-orange-600 hover:text-orange-700 font-medium"
                             >
                                 <ArrowLeft className="w-4 h-4" />
@@ -356,7 +356,7 @@ export default async function DistrictPage({
                             .map(([slug, name]) => (
                                 <Link
                                     key={slug}
-                                    href={`/restaurantes/${provinceSlug}/${slug}`}
+                                    href={`/restaurants/${provinceSlug}/${slug}`}
                                     className="bg-white rounded-xl px-5 py-3 hover:shadow-lg hover:border-orange-200 border border-gray-100 transition-all group flex items-center gap-2"
                                 >
                                     <MapPin className="w-4 h-4 text-orange-500 group-hover:scale-110 transition-transform" />

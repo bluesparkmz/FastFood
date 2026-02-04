@@ -173,10 +173,10 @@ function ProvincePills({ currentSlug }: { currentSlug: string }) {
             {Object.entries(PROVINCES).map(([slug, name]) => (
                 <Link
                     key={slug}
-                    href={`/restaurantes/${slug}`}
+                    href={`/restaurants/${slug}`}
                     className={`px-4 py-2 rounded-full text-sm font-medium transition-all border ${slug === currentSlug
-                            ? 'bg-orange-500 text-white border-orange-500 shadow-lg shadow-orange-500/20'
-                            : 'bg-gray-50 hover:bg-orange-50 text-gray-700 hover:text-orange-600 border-gray-100 hover:border-orange-200'
+                        ? 'bg-orange-500 text-white border-orange-500 shadow-lg shadow-orange-500/20'
+                        : 'bg-gray-50 hover:bg-orange-50 text-gray-700 hover:text-orange-600 border-gray-100 hover:border-orange-200'
                         }`}
                 >
                     {name}
@@ -288,7 +288,7 @@ export default async function ProvincePage({
                             .map(([s, name]) => (
                                 <Link
                                     key={s}
-                                    href={`/restaurantes/${s}`}
+                                    href={`/restaurants/${s}`}
                                     className="bg-white rounded-xl p-4 text-center hover:shadow-lg hover:border-orange-200 border border-gray-100 transition-all group"
                                 >
                                     <MapPin className="w-6 h-6 text-orange-500 mx-auto mb-2 group-hover:scale-110 transition-transform" />
