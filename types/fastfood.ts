@@ -42,8 +42,11 @@ export interface Restaurant {
   latitude: number | null;
   longitude: number | null;
   is_open: boolean;
+  is_disabled?: boolean;
   rating: number;
   total_reviews: number;
+  likes: number;
+  user_liked: boolean | null;
   catalog?: CatalogProduct[];
   created_at: string;
   updated_at: string;

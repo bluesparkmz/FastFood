@@ -8,6 +8,7 @@ import type { Restaurant } from '@/types/fastfood';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { getImageUrl } from '@/utils/imageUtils';
+import LikeButton from './LikeButton';
 
 interface RestaurantCardProps {
   restaurant?: Restaurant;

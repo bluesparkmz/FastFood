@@ -197,6 +197,22 @@ export const fastfoodApi = {
     return response.data;
   },
 
+  // ========== Likes ==========
+  async likeRestaurant(restaurantId: number): Promise<{ message: string; likes: number }> {
+    const response = await api.post(`/fastfood/restaurants/${restaurantId}/like`);
+    return response.data;
+  },
+
+  async unlikeRestaurant(restaurantId: number): Promise<{ message: string; likes: number }> {
+    const response = await api.delete(`/fastfood/restaurants/${restaurantId}/like`);
+    return response.data;
+  },
+
+  async checkRestaurantLiked(restaurantId: number): Promise<{ liked: boolean }> {
+    const response = await api.get(`/fastfood/restaurants/${restaurantId}/liked`);
+    return response.data;
+  },
+
   // ========== Explorer & Search ==========
   async searchAll(query: string): Promise<{ restaurants: Restaurant[], products: any[] }> {
     const response = await api.get('/fastfood/search/all', {
