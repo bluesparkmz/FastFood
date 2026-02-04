@@ -222,8 +222,7 @@ export default function RestaurantDetailPage() {
     )
     : catalog;
 
-  const suggestionResults = (normalizedSearch ? searchResults : catalog)
-    .slice(0, 12);
+  const suggestionResults = catalog.slice(0, 12);
 
   const enterSearchMode = () => {
     setIsSearchMode(true);
@@ -363,82 +362,96 @@ export default function RestaurantDetailPage() {
     <div className="min-h-screen bg-gray-50 pb-32 font-sans selection:bg-orange-100 selection:text-orange-900">
 
       {/* Hero Section - Streamlined */}
-      {!isSearchMode && (
-        <div className="relative w-full h-[300px] overflow-hidden">
-          {activeHeroImage ? (
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeHeroImage}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.6 }}
-                className="absolute inset-0"
-              >
-                <Image
-                  src={activeHeroImage}
-                  alt={restaurant.name}
-                  fill
-                  className="object-cover"
-                />
-              </motion.div>
-            </AnimatePresence>
-          ) : (
-            <div className="w-full h-full bg-orange-500" />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-
-        {/* Floating Mini Header */}
-        <div className="absolute top-0 left-0 w-full px-6 py-4 flex items-center justify-between z-20">
-          <button
-            onClick={() => router.back()}
-            className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/30 transition-all border border-white/20"
+      <AnimatePresence>
+        {!isSearchMode && (
+          <motion.div
+            key="restaurant-hero"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 300, opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 240, damping: 30 }}
+            className="relative w-full overflow-hidden"
           >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
+            <div className="relative w-full h-[300px] overflow-hidden">
+              {activeHeroImage ? (
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeHeroImage}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.6 }}
+                    className="absolute inset-0"
+                  >
+                    <Image
+                      src={activeHeroImage}
+                      alt={restaurant.name}
+                      fill
+                      className="object-cover"
+                    />
+                  </motion.div>
+                </AnimatePresence>
+              ) : (
+                <div className="w-full h-full bg-orange-500" />
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
 
-          <button
-            onClick={() => {
-              if (navigator.share) {
-                navigator.share({
-                  title: restaurant.name,
-                  text: `Confira o cardápio do ${restaurant.name} no SkyVenda FastFood!`,
-                  url: window.location.href,
-                }).catch(console.error);
-              } else {
-                navigator.clipboard.writeText(window.location.href);
-                toast.success('Link copiado para a área de transferência!');
-              }
-            }}
-            className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/30 transition-all border border-white/20"
-          >
-            <Share2 className="w-5 h-5" />
-          </button>
-        </div>
+              {/* Floating Mini Header */}
+              <div className="absolute top-0 left-0 w-full px-6 py-4 flex items-center justify-between z-20">
+                <button
+                  onClick={() => router.back()}
+                  className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/30 transition-all border border-white/20"
+                >
+                  <ChevronLeft className="w-6 h-6" />
+                </button>
 
-        <div className="absolute bottom-10 left-0 w-full px-6">
-          <div className="max-w-7xl mx-auto flex flex-col gap-2">
-            <h1 className="text-3xl font-black text-white tracking-tight">{restaurant.name}</h1>
-            <div className="flex items-center gap-3 text-white/80 text-xs font-bold uppercase tracking-widest">
-              <span className="flex items-center gap-1">
-                <Star className="w-3 h-3 text-orange-500 fill-orange-500" />
-                {restaurant.rating.toFixed(1)}
-              </span>
-              <span>•</span>
-              <span>{restaurant.category || 'Restaurante'}</span>
+                <button
+                  onClick={() => {
+                    if (navigator.share) {
+                      navigator.share({
+                        title: restaurant.name,
+                        text: `Confira o cardápio do ${restaurant.name} no SkyVenda FastFood!`,
+                        url: window.location.href,
+                      }).catch(console.error);
+                    } else {
+                      navigator.clipboard.writeText(window.location.href);
+                      toast.success('Link copiado para a área de transferência!');
+                    }
+                  }}
+                  className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/30 transition-all border border-white/20"
+                >
+                  <Share2 className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="absolute bottom-10 left-0 w-full px-6">
+                <div className="max-w-7xl mx-auto flex flex-col gap-2">
+                  <h1 className="text-3xl font-black text-white tracking-tight">{restaurant.name}</h1>
+                  <div className="flex items-center gap-3 text-white/80 text-xs font-bold uppercase tracking-widest">
+                    <span className="flex items-center gap-1">
+                      <Star className="w-3 h-3 text-orange-500 fill-orange-500" />
+                      {restaurant.rating.toFixed(1)}
+                    </span>
+                    <span>•</span>
+                    <span>{restaurant.category || 'Restaurante'}</span>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Main Content Area */}
       <motion.div
         style={{ y: contentY }}
-        className={cn(
-          "relative z-10 bg-gray-50 min-h-screen shadow-[0_-20px_40px_-15px_rgba(0,0,0,0.1)] pt-8",
-          isSearchMode ? "mt-0 rounded-none" : "-mt-6 rounded-t-[2.5rem]"
-        )}
+        animate={{
+          marginTop: isSearchMode ? 0 : -24,
+          borderTopLeftRadius: isSearchMode ? 0 : 40,
+          borderTopRightRadius: isSearchMode ? 0 : 40,
+        }}
+        transition={{ type: 'spring', stiffness: 240, damping: 30 }}
+        className="relative z-10 bg-gray-50 min-h-screen shadow-[0_-20px_40px_-15px_rgba(0,0,0,0.1)] pt-8"
       >
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           {/* Search Bar */}
