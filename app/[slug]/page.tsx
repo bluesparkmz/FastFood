@@ -197,22 +197,33 @@ export default function RestaurantDetailPage() {
     return total;
   };
 
-  // Load tabs and tables when orderType is local
+  // Load tables when orderType is local
   useEffect(() => {
-    if (orderType === 'local' && restaurant?.id && isLoggedIn) {
-      const loadTabsAndTables = async () => {
+    if (orderType === 'local' && restaurant?.id) {
+      const loadTables = async () => {
         try {
-          const [tabsData, tablesData] = await Promise.all([
-            fastfoodApi.getTabs(restaurant.id, 'open'),
-            fastfoodApi.getTables(restaurant.id)
-          ]);
-          setTabs(tabsData);
+          const tablesData = await fastfoodApi.getTables(restaurant.id);
           setTables(tablesData);
         } catch (error) {
-          console.error('Error loading tabs/tables:', error);
+          console.error('Error loading tables:', error);
         }
       };
-      loadTabsAndTables();
+      loadTables();
+    }
+  }, [orderType, restaurant?.id]);
+
+  // Load tabs separately (only if logged in)
+  useEffect(() => {
+    if (orderType === 'local' && restaurant?.id && isLoggedIn) {
+      const loadTabs = async () => {
+        try {
+          const tabsData = await fastfoodApi.getTabs(restaurant.id, 'open');
+          setTabs(tabsData);
+        } catch (error) {
+          console.error('Error loading tabs:', error);
+        }
+      };
+      loadTabs();
     }
   }, [orderType, restaurant?.id, isLoggedIn]);
 
