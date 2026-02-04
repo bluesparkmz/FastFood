@@ -98,8 +98,15 @@ export default function NearbyRestaurantsPage() {
       const allRestaurants = await fastfoodApi.getRestaurants(0, 1000);
       const restaurantsWithDistance = allRestaurants
         .map(restaurant => {
-          if (!restaurant.location_google_maps) return null;
-          const coords = extractCoordinates(restaurant.location_google_maps);
+          let coords = restaurant.location_google_maps
+            ? extractCoordinates(restaurant.location_google_maps)
+            : null;
+
+          // fallback para latitude/longitude salvos diretamente no restaurante
+          if (!coords && restaurant.latitude != null && restaurant.longitude != null) {
+            coords = { lat: restaurant.latitude, lng: restaurant.longitude };
+          }
+
           if (!coords) return null;
           const distance = calculateDistance(userLocation.latitude, userLocation.longitude, coords.lat, coords.lng);
           return { ...restaurant, distance, coordinates: coords };

@@ -8,13 +8,20 @@ import fastfoodApi from '@/api/fastfoodApi';
 import type { FastFoodOrder } from '@/types/fastfood';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
+import { useAuth } from '@/context/AuthContext';
 
 export default function OrdersPage() {
   const router = useRouter();
+  const { isLoggedIn, loading: authLoading } = useAuth();
   const [orders, setOrders] = useState<FastFoodOrder[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Só tenta carregar pedidos se o usuário estiver logado
+    if (!isLoggedIn) {
+      setLoading(false);
+      return;
+    }
     fetchOrders();
 
     const handleOrderUpdate = (event: any) => {
@@ -70,7 +77,7 @@ export default function OrdersPage() {
       window.removeEventListener('fastfood-new-order', handleNewOrder);
       window.removeEventListener('new-notification', handleOrderUpdate);
     };
-  }, []);
+  }, [isLoggedIn]);
 
   const fetchOrders = async () => {
     try {
@@ -114,9 +121,9 @@ export default function OrdersPage() {
         </div>
       </header>
 
-      {/* Orders List */}
+      {/* Orders List / Login Prompt */}
       <div className="max-w-3xl mx-auto px-4">
-        {loading ? (
+        {authLoading || loading ? (
           <div className="space-y-6">
             {[...Array(3)].map((_, i) => (
               <div key={i} className="bg-white rounded-[2rem] p-6 h-48 animate-pulse shadow-sm border border-gray-100">
@@ -130,6 +137,28 @@ export default function OrdersPage() {
               </div>
             ))}
           </div>
+        ) : !isLoggedIn ? (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col items-center justify-center py-20 px-6 text-center"
+          >
+            <div className="bg-orange-50 w-24 h-24 rounded-full flex items-center justify-center mb-6">
+              <UtensilsCrossed className="w-10 h-10 text-orange-500" />
+            </div>
+            <h3 className="text-2xl font-black text-gray-900 mb-2">
+              Entre para ver seus pedidos
+            </h3>
+            <p className="text-gray-500 mb-8 max-w-sm leading-relaxed">
+              Você precisa estar logado para visualizar o histórico de pedidos.
+            </p>
+            <button
+              onClick={() => router.push('/login')}
+              className="bg-gray-900 hover:bg-gray-800 text-white px-8 py-4 rounded-2xl font-bold shadow-xl shadow-gray-900/20 active:scale-95 transition-all w-full md:w-auto"
+            >
+              Fazer login
+            </button>
+          </motion.div>
         ) : orders.length === 0 ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
