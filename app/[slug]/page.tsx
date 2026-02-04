@@ -212,21 +212,6 @@ export default function RestaurantDetailPage() {
     }
   }, [orderType, restaurant?.id]);
 
-  // Load tabs separately (only if logged in)
-  useEffect(() => {
-    if (orderType === 'local' && restaurant?.id && isLoggedIn) {
-      const loadTabs = async () => {
-        try {
-          const tabsData = await fastfoodApi.getTabs(restaurant.id, 'open');
-          setTabs(tabsData);
-        } catch (error) {
-          console.error('Error loading tabs:', error);
-        }
-      };
-      loadTabs();
-    }
-  }, [orderType, restaurant?.id, isLoggedIn]);
-
   const normalizedSearch = searchTerm.trim().toLowerCase();
   const searchResults = normalizedSearch
     ? catalog.filter(i =>
