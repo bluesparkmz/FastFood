@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
-import { Html5QrcodeScanner, Html5QrcodeSupportedFormats } from 'html5-qrcode';
+import { Html5Qrcode } from 'html5-qrcode';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Camera, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -9,79 +9,101 @@ import toast from 'react-hot-toast';
 
 export default function QRScannerPage() {
     const router = useRouter();
-    const [scanner, setScanner] = useState<Html5QrcodeScanner | null>(null);
-    const [scannedResult, setScannedResult] = useState<string | null>(null);
+    const [isScanning, setIsScanning] = useState(true); // Auto-start
     const [error, setError] = useState<string | null>(null);
-    const scannerRef = useRef<HTMLDivElement>(null);
+    const scannerRef = useRef<Html5Qrcode | null>(null);
+    const mountedRef = useRef(false);
 
     useEffect(() => {
-        // Only initialize on client
-        if (typeof window === 'undefined') return;
+        mountedRef.current = true;
 
-        const config = {
-            fps: 10,
-            qrbox: { width: 250, height: 250 },
-            rememberLastUsedCamera: true,
-            supportedScanTypes: [0], // 0 for camera
-            formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+        // Initialize scanner
+        const initScanner = async () => {
+            if (!mountedRef.current) return;
+
+            try {
+                // Request camera permissions explicitly first to ensure browser API is ready
+                // This step is optional with html5-qrcode but good for debugging permissions
+                // await navigator.mediaDevices.getUserMedia({ video: true });
+
+                const html5QrCode = new Html5Qrcode("qr-reader");
+                scannerRef.current = html5QrCode;
+
+                const config = {
+                    fps: 10,
+                    qrbox: { width: 250, height: 250 },
+                    aspectRatio: 1.0
+                };
+
+                await html5QrCode.start(
+                    { facingMode: "environment" },
+                    config,
+                    (decodedText) => {
+                        handleQRCodeResult(decodedText);
+                    },
+                    (errorMessage) => {
+                        // ignore scan errors, they happen every frame no code is detected
+                    }
+                );
+            } catch (err) {
+                console.error("Error starting scanner:", err);
+                if (mountedRef.current) {
+                    setError("Não foi possível acessar a câmera. Verifique as permissões.");
+                }
+            }
         };
 
-        const newScanner = new Html5QrcodeScanner('qr-reader', config, false);
-
-        const onScanSuccess = (decodedText: string) => {
-            console.log(`Scan success: ${decodedText}`);
-            setScannedResult(decodedText);
-            newScanner.clear().catch(err => console.error("Failed to clear scanner", err));
-            handleQRCodeResult(decodedText);
-        };
-
-        const onScanFailure = (error: string) => {
-            // Too noisy to show every failure
-            // console.warn(`Scan error: ${error}`);
-        };
-
-        newScanner.render(onScanSuccess, onScanFailure);
-        setScanner(newScanner);
+        // Small timeout to ensure DOM is ready
+        const timer = setTimeout(() => {
+            initScanner();
+        }, 500);
 
         return () => {
-            if (newScanner) {
-                newScanner.clear().catch(err => console.error("Failed to clear scanner on unmount", err));
+            mountedRef.current = false;
+            clearTimeout(timer);
+            if (scannerRef.current && scannerRef.current.isScanning) {
+                scannerRef.current.stop().then(() => {
+                    scannerRef.current?.clear();
+                }).catch(err => console.error("Failed to stop scanner", err));
             }
         };
     }, []);
 
-    const handleQRCodeResult = (text: string) => {
+    const handleQRCodeResult = async (text: string) => {
+        if (!isScanning || !scannerRef.current) return;
+
+        // Pause to prevent multiple reads
+        await scannerRef.current.pause();
+        setIsScanning(false);
+
         try {
             // Try to see if it's a URL
-            const url = new URL(text);
-            // If it's a link to our app, extract the slug
-            // Expecting something like https://fastfood.skyvenda.mz/restaurant-slug
-            // or just /restaurant-slug
-            const pathname = url.pathname;
-            const slug = pathname.split('/').filter(Boolean).pop();
+            let slug = text;
+            try {
+                const url = new URL(text);
+                if (url.pathname.length > 1) {
+                    slug = url.pathname.split('/').filter(Boolean).pop() || text;
+                }
+            } catch (e) {
+                // Not a URL, use text as is
+            }
 
-            if (slug) {
+            if (slug && slug.length > 1) {
                 toast.success('Restaurante encontrado! Redirecionando...');
                 router.push(`/${slug}`);
             } else {
-                toast.error('QR Code inválido: Não foi possível identificar o restaurante.');
-                resetScanner();
+                throw new Error('QR Code inválido');
             }
         } catch (e) {
-            // Not a URL, maybe it's just the slug?
-            if (text && text.length > 2 && !text.includes(' ')) {
-                toast.success('Restaurante encontrado! Redirecionando...');
-                router.push(`/${text}`);
-            } else {
-                toast.error('QR Code inválido.');
-                resetScanner();
-            }
+            toast.error('QR Code inválido.');
+            // Resume scanning after a delay
+            setTimeout(() => {
+                if (mountedRef.current && scannerRef.current) {
+                    scannerRef.current.resume();
+                    setIsScanning(true);
+                }
+            }, 2000);
         }
-    };
-
-    const resetScanner = () => {
-        setScannedResult(null);
-        window.location.reload(); // Simplest way to restart html5-qrcode-scanner
     };
 
     return (
@@ -90,7 +112,7 @@ export default function QRScannerPage() {
             <div className="absolute top-0 left-0 w-full z-10 px-6 py-8 flex items-center justify-between bg-gradient-to-b from-black/80 to-transparent">
                 <button
                     onClick={() => router.back()}
-                    className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 hover:bg-white/20 transition-all"
+                    className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 hover:bg-white/20 transition-all z-20"
                 >
                     <ArrowLeft className="w-6 h-6 text-white" />
                 </button>
@@ -100,11 +122,23 @@ export default function QRScannerPage() {
 
             {/* Scanner Viewport */}
             <div className="flex-1 flex flex-col items-center justify-center p-6 relative">
-                <div className="w-full max-w-sm aspect-square relative rounded-[2.5rem] overflow-hidden border-2 border-orange-500/50 shadow-[0_0_50px_rgba(249,115,22,0.2)] bg-gray-900/50">
-                    <div id="qr-reader" className="w-full h-full border-none"></div>
+                <div className="w-full max-w-sm aspect-square relative rounded-[2.5rem] overflow-hidden border-2 border-orange-500/50 shadow-[0_0_50px_rgba(249,115,22,0.2)] bg-gray-900">
+                    <div id="qr-reader" className="w-full h-full"></div>
 
-                    {/* Custom Overlay (simulated because html5-qrcode doesn't allow full CSS control easily) */}
-                    <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                    {error && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-gray-900 p-6 text-center">
+                            <p className="text-red-400 font-bold text-sm">{error}</p>
+                        </div>
+                    )}
+
+                    {!isScanning && !error && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-10">
+                            <div className="w-10 h-10 border-4 border-white/30 border-t-white rounded-full animate-spin" />
+                        </div>
+                    )}
+
+                    {/* Custom Overlay */}
+                    <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-0">
                         <div className="w-64 h-64 border-2 border-orange-500 rounded-3xl relative">
                             <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-white rounded-tl-xl -translate-x-1 -translate-y-1" />
                             <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-white rounded-tr-xl translate-x-1 -translate-y-1" />
@@ -112,11 +146,13 @@ export default function QRScannerPage() {
                             <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-white rounded-br-xl translate-x-1 translate-y-1" />
 
                             {/* Scanning Line */}
-                            <motion.div
-                                className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-orange-500 to-transparent shadow-[0_0_15px_rgba(249,115,22,0.8)]"
-                                animate={{ top: ['5%', '95%'] }}
-                                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                            />
+                            {isScanning && !error && (
+                                <motion.div
+                                    className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-orange-500 to-transparent shadow-[0_0_15px_rgba(249,115,22,0.8)]"
+                                    animate={{ top: ['5%', '95%'] }}
+                                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                                />
+                            )}
                         </div>
                     </div>
                 </div>
@@ -133,23 +169,13 @@ export default function QRScannerPage() {
             </div>
 
             <style jsx global>{`
-        #qr-reader {
-          border: none !important;
-          background: transparent !important;
-        }
-        #qr-reader__scan_region {
-           background: transparent !important;
-        }
-        #qr-reader__dashboard {
-          display: none !important; /* Hide the ugly default dashboard */
-        }
-        #qr-reader video {
-          object-fit: cover !important;
-          width: 100% !important;
-          height: 100% !important;
-          border-radius: 2.5rem !important;
-        }
-      `}</style>
+                #qr-reader video {
+                    object-fit: cover;
+                    width: 100% !important;
+                    height: 100% !important;
+                    border-radius: 2.5rem;
+                }
+            `}</style>
         </div>
     );
 }
