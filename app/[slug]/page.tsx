@@ -929,14 +929,14 @@ export default function RestaurantDetailPage() {
                     </p>
                     <p className="text-xs font-mono text-gray-300 break-all">
                       {typeof window !== 'undefined'
-                        ? `${window.location.origin}/${restaurant.slug}`
-                        : `/${restaurant.slug}`}
+                        ? `${window.location.origin}/share/${restaurant.slug}`
+                        : `/share/${restaurant.slug}`}
                     </p>
                   </div>
                   <button
                     onClick={async () => {
                       if (typeof window === 'undefined') return;
-                      const url = `${window.location.origin}/${restaurant.slug}`;
+                      const url = `${window.location.origin}/share/${restaurant.slug}`;
                       try {
                         setCopying(true);
                         await navigator.clipboard.writeText(url);
@@ -963,7 +963,7 @@ export default function RestaurantDetailPage() {
                       // Usando serviço externo simples para gerar QR code a partir da URL
                       <img
                         src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
-                          `${window.location.origin}/${restaurant.slug}`
+                          `${window.location.origin}/share/${restaurant.slug}`
                         )}`}
                         alt="QR Code do restaurante"
                         className="w-44 h-44 object-contain"
