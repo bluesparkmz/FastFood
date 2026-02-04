@@ -35,7 +35,7 @@ export default function RestaurantDetailPage() {
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isSearchMode, setIsSearchMode] = useState(false);
   const [userDistance, setUserDistance] = useState<number | null>(null);
 
   const { restaurants, pagedRestaurants } = useHome();
@@ -224,17 +224,18 @@ export default function RestaurantDetailPage() {
   const suggestionResults = (normalizedSearch ? searchResults : catalog)
     .slice(0, 12);
 
-  const openSearch = () => {
-    setIsSearchOpen(true);
+  const enterSearchMode = () => {
+    setIsSearchMode(true);
   };
 
-  const closeSearch = () => {
-    setIsSearchOpen(false);
+  const exitSearchMode = () => {
+    setIsSearchMode(false);
+    setSearchTerm('');
   };
 
   const selectSearchItem = (itemId: number, itemName: string) => {
     setSearchTerm(itemName);
-    setIsSearchOpen(false);
+    setIsSearchMode(false);
     setTimeout(() => {
       const el = document.getElementById(`product-${itemId}`);
       el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -343,17 +344,19 @@ export default function RestaurantDetailPage() {
     <div className="min-h-screen bg-gray-50 pb-32 font-sans selection:bg-orange-100 selection:text-orange-900">
 
       {/* Hero Section - Streamlined */}
-      <div className="relative w-full h-[300px] overflow-hidden">
-        {coverImage ? (
-          <Image
-            src={coverImage}
-            alt={restaurant.name}
-            fill
-            className="object-cover"
-          />
-        ) : (
-          <div className="w-full h-full bg-orange-500" />
-        )}
+      {!isSearchMode && (
+        <div className="relative w-full h-[300px] overflow-hidden">
+          {coverImage ? (
+            <Image
+              src={coverImage}
+              alt={restaurant.name}
+              fill
+              className="object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-orange-500" />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
 
         {/* Floating Mini Header */}
@@ -398,11 +401,15 @@ export default function RestaurantDetailPage() {
           </div>
         </div>
       </div>
+      )}
 
       {/* Main Content Area */}
       <motion.div
         style={{ y: contentY }}
-        className="relative z-10 -mt-6 bg-gray-50 rounded-t-[2.5rem] min-h-screen shadow-[0_-20px_40px_-15px_rgba(0,0,0,0.1)] pt-8"
+        className={cn(
+          "relative z-10 bg-gray-50 min-h-screen shadow-[0_-20px_40px_-15px_rgba(0,0,0,0.1)] pt-8",
+          isSearchMode ? "mt-0 rounded-none" : "-mt-6 rounded-t-[2.5rem]"
+        )}
       >
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           {/* Search Bar */}
@@ -413,127 +420,64 @@ export default function RestaurantDetailPage() {
                 type="text"
                 placeholder="Pesquisar comidas ou bebidas..."
                 value={searchTerm}
-                readOnly
-                onClick={openSearch}
-                onFocus={openSearch}
+                onClick={enterSearchMode}
+                onFocus={enterSearchMode}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full bg-white border-none rounded-[1.5rem] py-5 pl-16 pr-6 text-base font-bold shadow-soft shadow-black/5 focus:shadow-xl focus:shadow-orange-500/5 outline-none transition-all placeholder:text-gray-400 text-gray-900"
               />
+
+              {isSearchMode && (
+                <button
+                  onClick={exitSearchMode}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
+                  title="Fechar"
+                >
+                  <XCircle className="w-5 h-5" />
+                </button>
+              )}
             </div>
+
+            {isSearchMode && (
+              <div className="mt-4 bg-white rounded-[1.5rem] border border-gray-100 shadow-sm overflow-hidden">
+                <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
+                  <p className="text-xs font-black uppercase tracking-widest text-gray-400">
+                    {normalizedSearch ? 'Resultados' : 'Sugestões'}
+                  </p>
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                    {normalizedSearch ? searchResults.length : suggestionResults.length}
+                  </p>
+                </div>
+
+                <div className="max-h-[60vh] overflow-y-auto">
+                  {normalizedSearch && searchResults.length === 0 ? (
+                    <div className="py-14 text-center opacity-50">
+                      <Search className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                      <p className="font-black uppercase text-xs tracking-[0.3em]">Nenhum item encontrado</p>
+                    </div>
+                  ) : (
+                    (normalizedSearch ? searchResults.slice(0, 30) : suggestionResults).map((item) => (
+                      <button
+                        key={item.id}
+                        onClick={() => selectSearchItem(item.id, item.name)}
+                        className="w-full text-left px-6 py-4 border-b border-gray-50 hover:bg-orange-50/40 transition-colors"
+                      >
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="min-w-0">
+                            <p className="text-sm font-black text-gray-900 truncate">{item.name}</p>
+                            <p className="text-xs font-medium text-gray-500 truncate mt-1">{item.category || 'Geral'}</p>
+                          </div>
+                          <div className="text-sm font-black text-orange-600 whitespace-nowrap">{Number(item.price || 0).toFixed(0)} MT</div>
+                        </div>
+                      </button>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
-          <AnimatePresence>
-            {isSearchOpen && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[70] bg-black/40 backdrop-blur-sm"
-                onClick={closeSearch}
-              >
-                <motion.div
-                  initial={{ y: 30, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: 30, opacity: 0 }}
-                  transition={{ type: 'spring', stiffness: 260, damping: 24 }}
-                  className="absolute inset-x-0 top-0 bottom-0 bg-white"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <div className="sticky top-0 z-10 bg-white/90 backdrop-blur-xl border-b border-gray-100 px-4 py-4">
-                    <div className="max-w-3xl mx-auto flex items-center gap-3">
-                      <button
-                        onClick={closeSearch}
-                        className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
-                      >
-                        <XCircle className="w-6 h-6" />
-                      </button>
-
-                      <div className="relative flex-1 group">
-                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-orange-500 transition-colors" />
-                        <input
-                          autoFocus
-                          type="text"
-                          placeholder="Pesquisar no cardápio..."
-                          value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
-                          className="w-full bg-gray-50 border-none rounded-2xl py-4 pl-14 pr-12 text-sm font-bold outline-none focus:ring-2 focus:ring-orange-500/10 focus:bg-white transition-all"
-                        />
-                        {searchTerm && (
-                          <button
-                            onClick={() => setSearchTerm('')}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-gray-300 hover:text-gray-900"
-                          >
-                            <XCircle className="w-5 h-5" />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="max-w-3xl mx-auto px-4 py-6">
-                    {!normalizedSearch ? (
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Sugestões</h3>
-                        </div>
-                        <div className="space-y-3">
-                          {suggestionResults.map((item) => (
-                            <button
-                              key={item.id}
-                              onClick={() => selectSearchItem(item.id, item.name)}
-                              className="w-full text-left bg-white rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-lg hover:shadow-orange-500/5 transition-all p-4"
-                            >
-                              <div className="flex items-center justify-between gap-4">
-                                <div className="min-w-0">
-                                  <p className="text-sm font-black text-gray-900 truncate">{item.name}</p>
-                                  <p className="text-xs font-medium text-gray-500 truncate mt-1">{item.category || 'Geral'}</p>
-                                </div>
-                                <div className="text-sm font-black text-orange-600 whitespace-nowrap">{Number(item.price || 0).toFixed(0)} MT</div>
-                              </div>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Resultados</h3>
-                          <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{searchResults.length}</span>
-                        </div>
-
-                        {searchResults.length === 0 ? (
-                          <div className="py-20 text-center opacity-40">
-                            <Search className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                            <p className="font-black uppercase text-xs tracking-[0.3em]">Nenhum item encontrado</p>
-                          </div>
-                        ) : (
-                          <div className="space-y-3">
-                            {searchResults.slice(0, 30).map((item) => (
-                              <button
-                                key={item.id}
-                                onClick={() => selectSearchItem(item.id, item.name)}
-                                className="w-full text-left bg-white rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-lg hover:shadow-orange-500/5 transition-all p-4"
-                              >
-                                <div className="flex items-center justify-between gap-4">
-                                  <div className="min-w-0">
-                                    <p className="text-sm font-black text-gray-900 truncate">{item.name}</p>
-                                    <p className="text-xs font-medium text-gray-500 truncate mt-1">{item.category || 'Geral'}</p>
-                                  </div>
-                                  <div className="text-sm font-black text-orange-600 whitespace-nowrap">{Number(item.price || 0).toFixed(0)} MT</div>
-                                </div>
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
           {/* Sticky Category Navigation */}
-          {!searchTerm && (
+          {!searchTerm && !isSearchMode && (
             <div className="sticky top-4 z-30 mb-8">
               <div className="bg-white/80 backdrop-blur-xl border border-white/40 shadow-xl shadow-black/5 p-2 rounded-[1.5rem] flex overflow-x-auto gap-2 no-scrollbar scroll-smooth">
                 {categories.map((cat) => (
