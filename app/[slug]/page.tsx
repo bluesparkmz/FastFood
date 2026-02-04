@@ -743,7 +743,6 @@ export default function RestaurantDetailPage() {
 
                         {orderType === 'local' && (
                           <div className="space-y-3">
-                            {/* Table Selection */}
                             <div className="space-y-1">
                               <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Mesa (Opcional)</label>
                               <select
@@ -752,42 +751,16 @@ export default function RestaurantDetailPage() {
                                 className="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-orange-500 font-medium"
                               >
                                 <option value="">Nenhuma mesa</option>
-                                {tables.filter(t => t.status === 'available').map(table => (
-                                  <option key={table.id} value={table.id}>
+                                {tables.map(table => (
+                                  <option
+                                    key={table.id}
+                                    value={table.id}
+                                    disabled={table.status !== 'available'}
+                                  >
                                     {table.table_number} ({table.seats} lugares)
                                   </option>
                                 ))}
                               </select>
-                            </div>
-
-                            {/* Tab Selection */}
-                            <div className="space-y-1">
-                              <div className="flex items-center justify-between">
-                                <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Adicionar à Conta (Opcional)</label>
-                                <button
-                                  onClick={() => setShowTabModal(true)}
-                                  className="text-[10px] font-bold text-orange-500 hover:text-orange-400 uppercase tracking-widest"
-                                >
-                                  + Nova Conta
-                                </button>
-                              </div>
-                              <select
-                                value={selectedTab || ''}
-                                onChange={(e) => setSelectedTab(e.target.value ? Number(e.target.value) : null)}
-                                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-orange-500 font-medium"
-                              >
-                                <option value="">Nenhuma conta</option>
-                                {tabs.map(tab => (
-                                  <option key={tab.id} value={tab.id}>
-                                    {tab.client_name} - {Number(tab.current_balance).toFixed(2)} MT
-                                  </option>
-                                ))}
-                              </select>
-                              {selectedTab && (
-                                <p className="text-[10px] text-orange-400 font-medium">
-                                  O pedido será adicionado à conta. O cliente pagará depois.
-                                </p>
-                              )}
                             </div>
                           </div>
                         )}
@@ -827,67 +800,6 @@ export default function RestaurantDetailPage() {
         )}
       </AnimatePresence>
 
-      {/* Create Tab Modal */}
-      {showTabModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-gray-800 border border-gray-700 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
-            <div className="px-6 py-5 border-b border-gray-700 flex items-center justify-between">
-              <h2 className="font-bold text-lg text-white">Nova Conta de Cliente</h2>
-              <button
-                onClick={() => {
-                  setShowTabModal(false);
-                  setNewTabName('');
-                  setNewTabPhone('');
-                }}
-                className="text-gray-400 hover:text-white text-2xl leading-none"
-              >
-                ×
-              </button>
-            </div>
-            <div className="p-6 space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-widest">Nome do Cliente</label>
-                <input
-                  type="text"
-                  value={newTabName}
-                  onChange={(e) => setNewTabName(e.target.value)}
-                  placeholder="Ex: Sr. João"
-                  className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-orange-500 font-medium placeholder:text-gray-600"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-widest">Telefone (Opcional)</label>
-                <input
-                  type="text"
-                  value={newTabPhone}
-                  onChange={(e) => setNewTabPhone(e.target.value)}
-                  placeholder="Ex: +258 84 123 4567"
-                  className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-orange-500 font-medium placeholder:text-gray-600"
-                />
-              </div>
-            </div>
-            <div className="px-6 py-5 bg-gray-900/50 border-t border-gray-700 flex gap-3">
-              <button
-                onClick={() => {
-                  setShowTabModal(false);
-                  setNewTabName('');
-                  setNewTabPhone('');
-                }}
-                className="flex-1 py-3 text-sm font-bold text-gray-400 hover:text-white transition-colors rounded-xl"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleCreateTab}
-                disabled={!newTabName.trim()}
-                className="flex-1 py-3 bg-orange-500 hover:bg-orange-600 text-white font-black rounded-xl disabled:opacity-50 transition-all"
-              >
-                Criar Conta
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Share Dialog - FastFood Dark Style */}
       <AnimatePresence>
