@@ -77,25 +77,37 @@ export default function QRScannerPage() {
         setIsScanning(false);
 
         try {
-            // Try to see if it's a URL
-            let slug = text;
-            try {
-                const url = new URL(text);
-                if (url.pathname.length > 1) {
-                    slug = url.pathname.split('/').filter(Boolean).pop() || text;
+            // Validate domain
+            const allowedDomains = ['https://fastfood.skyvenda.com', 'https://fastfood.skyvenda.mz'];
+            const isAllowedUrl = allowedDomains.some(domain => text.startsWith(domain));
+
+            if (isAllowedUrl) {
+                try {
+                    const url = new URL(text);
+                    const slug = url.pathname.split('/').filter(Boolean).pop();
+
+                    if (slug) {
+                        toast.success('Restaurante encontrado! Redirecionando...');
+                        router.push(`/${slug}`);
+                        return;
+                    }
+                } catch (e) {
+                    // Invalid URL parsing
                 }
-            } catch (e) {
-                // Not a URL, use text as is
             }
 
-            if (slug && slug.length > 1) {
-                toast.success('Restaurante encontrado! Redirecionando...');
-                router.push(`/${slug}`);
-            } else {
-                throw new Error('QR Code inválido');
-            }
-        } catch (e) {
-            toast.error('QR Code inválido.');
+            // If not a valid URL from our domain, treat as error or check if it's just a slug (legacy support, or optional)
+            // For now, adhering strictly to user request to "only extract slug" if it starts with the domain.
+            // But usually we might want to support scanning just the slug too? 
+            // The user said: "verifica se a url comeca com ... e so extrai o slug". 
+            // This implies: IF it is a URL, it MUST match. 
+            // Only if it's NOT a URL, maybe we treat as slug? 
+            // Let's be strict for safety as requested.
+
+            throw new Error('QR Code inválido: URL não reconhecida.');
+
+        } catch (e: any) {
+            toast.error(e.message || 'QR Code inválido.');
             // Resume scanning after a delay
             setTimeout(() => {
                 if (mountedRef.current && scannerRef.current) {

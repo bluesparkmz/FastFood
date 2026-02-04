@@ -9,7 +9,7 @@ import {
 import { motion } from 'framer-motion';
 import fastfoodApi from '@/api/fastfoodApi';
 import type { FastFoodOrder } from '@/types/fastfood';
-import { getImageUrl } from '@/utils/imageUtils';
+import { getImageUrl, isEmoji } from '@/utils/imageUtils';
 import toast from 'react-hot-toast';
 import { cn } from '@/lib/utils';
 
@@ -40,11 +40,11 @@ export default function OrderDetailsPage() {
         const handleOrderStatusUpdate = (event: any) => {
             const data = event.detail;
             const updateOrderId = data.order_id || data.data?.reference_id || data.data?.order_id;
-            
+
             if (Number(updateOrderId) === orderId) {
                 console.log('Real-time: Order status update received, refreshing details...', data);
                 fetchOrderDetails(String(orderId), false); // Silent refresh
-                
+
                 // Show toast notification
                 const newStatus = data.new_status || data.data?.notification_type?.replace('order_', '');
                 if (newStatus) {
@@ -58,7 +58,7 @@ export default function OrderDetailsPage() {
         const handleOrderUpdate = (event: any) => {
             const data = event.detail;
             const updateOrderId = data.order_id || data.data?.reference_id || data.data?.order_id;
-            
+
             if (Number(updateOrderId) === orderId) {
                 console.log('Real-time: Order update received, refreshing details...', data);
                 fetchOrderDetails(String(orderId), false); // Silent refresh
@@ -69,12 +69,12 @@ export default function OrderDetailsPage() {
             const data = event.detail;
             const notificationType = data.data?.notification_type || data.data?.type || data.tipo || '';
             const updateOrderId = data.order_id || data.data?.reference_id || data.data?.order_id;
-            
+
             // Check if it's an order-related notification for this order
-            const isOrderNotification = 
-                notificationType?.startsWith('order_') || 
+            const isOrderNotification =
+                notificationType?.startsWith('order_') ||
                 data.data?.reference_type === 'FastFoodOrder';
-            
+
             if (isOrderNotification && Number(updateOrderId) === orderId) {
                 console.log('Real-time: Order notification received, refreshing details...', data);
                 fetchOrderDetails(String(orderId), false); // Silent refresh
@@ -296,16 +296,23 @@ export default function OrderDetailsPage() {
                             // Defensive price fallback
                             const itemPrice = item.price || (item as any).product?.price || 0;
 
+                            // Emoji fallback logic
+                            const itemEmoji = (item as any).emoji || (item as any).product?.emoji;
+                            const isEmojiImage = itemImage && isEmoji(itemImage);
+                            const displayEmoji = isEmojiImage ? itemImage : (itemEmoji || '🍔');
+
                             return (
                                 <div key={idx} className="py-4 flex items-center gap-4 first:pt-0 last:pb-0">
-                                    {itemImage ? (
+                                    {itemImage && !isEmojiImage ? (
                                         <img
                                             src={getImageUrl(itemImage)}
                                             alt={itemName}
                                             className="w-16 h-16 rounded-2xl object-cover bg-gray-100"
                                         />
                                     ) : (
-                                        <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center text-gray-300 font-bold text-xs">IMG</div>
+                                        <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center text-3xl">
+                                            {displayEmoji}
+                                        </div>
                                     )}
                                     <div className="flex-1">
                                         <h4 className="font-bold text-gray-900 text-sm md:text-base line-clamp-1">{itemName}</h4>
