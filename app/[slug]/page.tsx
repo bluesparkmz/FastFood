@@ -242,6 +242,28 @@ export default function RestaurantDetailPage() {
     }, 50);
   };
 
+  const coverImage = restaurant?.cover_image ? getImageUrl(restaurant.cover_image) : null;
+  const extraImages = getMultipleImageUrls(restaurant?.images);
+  const heroImages = [coverImage, ...extraImages].filter((x): x is string => !!x);
+  const activeHeroImage = heroImages.length > 0 ? heroImages[heroImageIndex % heroImages.length] : null;
+
+  useEffect(() => {
+    if (!restaurant?.id) return;
+    setHeroImageIndex(0);
+  }, [restaurant?.id]);
+
+  useEffect(() => {
+    if (!restaurant?.id) return;
+    if (isSearchMode) return;
+    if (heroImages.length <= 1) return;
+
+    const id = window.setInterval(() => {
+      setHeroImageIndex((prev) => (prev + 1) % heroImages.length);
+    }, 4000);
+
+    return () => window.clearInterval(id);
+  }, [restaurant?.id, heroImages.length, isSearchMode]);
+
   const handleCreateTab = async () => {
     if (!newTabName.trim()) {
       toast.error('Informe o nome do cliente');
@@ -326,27 +348,8 @@ export default function RestaurantDetailPage() {
   }
 
   const isOpen = restaurant.is_open;
-  const coverImage = restaurant.cover_image ? getImageUrl(restaurant.cover_image) : null;
-  const extraImages = getMultipleImageUrls((restaurant as any).images);
-  const heroImages = [coverImage, ...extraImages].filter((x): x is string => !!x);
-  const activeHeroImage = heroImages.length > 0 ? heroImages[heroImageIndex % heroImages.length] : null;
   const categoriesList = Array.from(new Set(catalog.map(i => i.category).filter(Boolean) as string[]));
   const hasItemsWithoutCategory = catalog.some(i => !i.category);
-
-  useEffect(() => {
-    setHeroImageIndex(0);
-  }, [restaurant.id]);
-
-  useEffect(() => {
-    if (isSearchMode) return;
-    if (heroImages.length <= 1) return;
-
-    const id = window.setInterval(() => {
-      setHeroImageIndex((prev) => (prev + 1) % heroImages.length);
-    }, 4000);
-
-    return () => window.clearInterval(id);
-  }, [heroImages.length, isSearchMode]);
 
   const displayCategories = [...categoriesList];
   if (hasItemsWithoutCategory) {
