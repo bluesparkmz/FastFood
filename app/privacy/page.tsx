@@ -46,7 +46,7 @@ export default function PrivacyPage() {
                                 <p className="text-gray-600 leading-relaxed text-sm">
                                     Coletamos informações necessárias para o funcionamento do serviço, incluindo:
                                     <br />• Dados de cadastro (nome, e-mail, telefone)
-                                    <br />• Endereço de entrega e localização
+                                    <br />• <strong>Localização em tempo real:</strong> Coletamos sua localização exata para sugerir os restaurantes e parceiros mais próximos de você (funcionalidade "Perto de Mim") e para calcular taxas e tempo de entrega.
                                     <br />• Histórico de pedidos e preferências
                                 </p>
                             </div>

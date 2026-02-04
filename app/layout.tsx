@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import BottomNav from "@/components/fastfood/BottomNav";
+import CookieConsent from "@/components/fastfood/CookieConsent";
 import Header from "@/components/fastfood/Header";
 import { HomeProvider } from "@/context/HomeContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -42,6 +43,7 @@ export default function RootLayout({
           </WebSocketProvider>
         </AuthProvider>
         <BottomNav />
+        <CookieConsent />
       </body>
     </html>
   );

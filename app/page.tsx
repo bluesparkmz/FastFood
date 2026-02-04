@@ -557,6 +557,28 @@ export default function FastFoodPage() {
                 // { icon: TrendingUp, label: 'Estatísticas', path: '/sales', color: 'emerald' },
                 // { icon: Settings, label: 'Configurações', path: '/settings', color: 'gray' },
                 */}
+                {/* Ajuda e Privacidade */}
+                <div className="pt-4 border-t border-gray-100 mt-4 space-y-2">
+                  <button
+                    onClick={() => { router.push('/help'); setShowMenu(false); }}
+                    className="w-full flex items-center gap-4 p-4 rounded-3xl hover:bg-gray-50 transition-colors text-left group"
+                  >
+                    <div className={cn("w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm border border-gray-100 group-hover:scale-110 transition-transform")}>
+                      <span className="text-lg">❓</span>
+                    </div>
+                    <span className="font-bold text-sm text-gray-600 group-hover:text-gray-900">Ajuda e Suporte</span>
+                  </button>
+
+                  <button
+                    onClick={() => { router.push('/privacy'); setShowMenu(false); }}
+                    className="w-full flex items-center gap-4 p-4 rounded-3xl hover:bg-gray-50 transition-colors text-left group"
+                  >
+                    <div className={cn("w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm border border-gray-100 group-hover:scale-110 transition-transform")}>
+                      <span className="text-lg">🔒</span>
+                    </div>
+                    <span className="font-bold text-sm text-gray-600 group-hover:text-gray-900">Política de Privacidade</span>
+                  </button>
+                </div>
               </div>
 
               <div className="p-8 border-t border-gray-50">
