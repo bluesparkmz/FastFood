@@ -69,7 +69,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
     // Province routes
     const provinceRoutes: MetadataRoute.Sitemap = Object.keys(PROVINCES_WITH_DISTRICTS).map((province) => ({
-        url: `${BASE_URL}/restaurantes/${province}`,
+        url: `${BASE_URL}/restaurants/${province}`,
         lastModified: now,
         changeFrequency: 'daily' as const,
         priority: 0.8,
@@ -79,7 +79,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     const districtRoutes: MetadataRoute.Sitemap = Object.entries(PROVINCES_WITH_DISTRICTS).flatMap(
         ([province, districts]) =>
             districts.map((district) => ({
-                url: `${BASE_URL}/restaurantes/${province}/${district}`,
+                url: `${BASE_URL}/restaurants/${province}/${district}`,
                 lastModified: now,
                 changeFrequency: 'daily' as const,
                 priority: 0.7,

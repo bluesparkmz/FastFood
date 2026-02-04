@@ -176,7 +176,7 @@ export default async function RestaurantesPage() {
                         {PROVINCES.map((province) => (
                             <Link
                                 key={province.slug}
-                                href={`/restaurantes/${province.slug}`}
+                                href={`/restaurants/${province.slug}`}
                                 className="flex-shrink-0 px-4 py-1.5 bg-gray-50 hover:bg-orange-50 text-gray-700 hover:text-orange-600 rounded-full text-sm font-medium transition-all hover:shadow-sm border border-gray-100 hover:border-orange-200 whitespace-nowrap"
                             >
                                 {province.name}

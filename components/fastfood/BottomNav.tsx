@@ -18,6 +18,10 @@ const BottomNav = () => {
         { icon: User, label: 'Perfil', path: '/profile' },
     ];
 
+    if (pathname?.startsWith('/restaurantes')) {
+        return null;
+    }
+
     return (
         <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-t border-gray-100 pb-safe">
             <div className="max-w-md mx-auto flex items-center justify-around h-16">
