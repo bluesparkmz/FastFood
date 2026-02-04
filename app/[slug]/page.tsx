@@ -35,6 +35,7 @@ export default function RestaurantDetailPage() {
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [userDistance, setUserDistance] = useState<number | null>(null);
 
   const { restaurants, pagedRestaurants } = useHome();
@@ -212,6 +213,34 @@ export default function RestaurantDetailPage() {
     }
   }, [orderType, restaurant?.id, isLoggedIn]);
 
+  const normalizedSearch = searchTerm.trim().toLowerCase();
+  const searchResults = normalizedSearch
+    ? catalog.filter(i =>
+      i.name.toLowerCase().includes(normalizedSearch) ||
+      (i.description && i.description.toLowerCase().includes(normalizedSearch))
+    )
+    : catalog;
+
+  const suggestionResults = (normalizedSearch ? searchResults : catalog)
+    .slice(0, 12);
+
+  const openSearch = () => {
+    setIsSearchOpen(true);
+  };
+
+  const closeSearch = () => {
+    setIsSearchOpen(false);
+  };
+
+  const selectSearchItem = (itemId: number, itemName: string) => {
+    setSearchTerm(itemName);
+    setIsSearchOpen(false);
+    setTimeout(() => {
+      const el = document.getElementById(`product-${itemId}`);
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 50);
+  };
+
   const handleCreateTab = async () => {
     if (!newTabName.trim()) {
       toast.error('Informe o nome do cliente');
@@ -384,11 +413,124 @@ export default function RestaurantDetailPage() {
                 type="text"
                 placeholder="Pesquisar comidas ou bebidas..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                readOnly
+                onClick={openSearch}
+                onFocus={openSearch}
                 className="w-full bg-white border-none rounded-[1.5rem] py-5 pl-16 pr-6 text-base font-bold shadow-soft shadow-black/5 focus:shadow-xl focus:shadow-orange-500/5 outline-none transition-all placeholder:text-gray-400 text-gray-900"
               />
             </div>
           </div>
+
+          <AnimatePresence>
+            {isSearchOpen && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-[70] bg-black/40 backdrop-blur-sm"
+                onClick={closeSearch}
+              >
+                <motion.div
+                  initial={{ y: 30, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: 30, opacity: 0 }}
+                  transition={{ type: 'spring', stiffness: 260, damping: 24 }}
+                  className="absolute inset-x-0 top-0 bottom-0 bg-white"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="sticky top-0 z-10 bg-white/90 backdrop-blur-xl border-b border-gray-100 px-4 py-4">
+                    <div className="max-w-3xl mx-auto flex items-center gap-3">
+                      <button
+                        onClick={closeSearch}
+                        className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
+                      >
+                        <XCircle className="w-6 h-6" />
+                      </button>
+
+                      <div className="relative flex-1 group">
+                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-orange-500 transition-colors" />
+                        <input
+                          autoFocus
+                          type="text"
+                          placeholder="Pesquisar no cardápio..."
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          className="w-full bg-gray-50 border-none rounded-2xl py-4 pl-14 pr-12 text-sm font-bold outline-none focus:ring-2 focus:ring-orange-500/10 focus:bg-white transition-all"
+                        />
+                        {searchTerm && (
+                          <button
+                            onClick={() => setSearchTerm('')}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-gray-300 hover:text-gray-900"
+                          >
+                            <XCircle className="w-5 h-5" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="max-w-3xl mx-auto px-4 py-6">
+                    {!normalizedSearch ? (
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Sugestões</h3>
+                        </div>
+                        <div className="space-y-3">
+                          {suggestionResults.map((item) => (
+                            <button
+                              key={item.id}
+                              onClick={() => selectSearchItem(item.id, item.name)}
+                              className="w-full text-left bg-white rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-lg hover:shadow-orange-500/5 transition-all p-4"
+                            >
+                              <div className="flex items-center justify-between gap-4">
+                                <div className="min-w-0">
+                                  <p className="text-sm font-black text-gray-900 truncate">{item.name}</p>
+                                  <p className="text-xs font-medium text-gray-500 truncate mt-1">{item.category || 'Geral'}</p>
+                                </div>
+                                <div className="text-sm font-black text-orange-600 whitespace-nowrap">{Number(item.price || 0).toFixed(0)} MT</div>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Resultados</h3>
+                          <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{searchResults.length}</span>
+                        </div>
+
+                        {searchResults.length === 0 ? (
+                          <div className="py-20 text-center opacity-40">
+                            <Search className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                            <p className="font-black uppercase text-xs tracking-[0.3em]">Nenhum item encontrado</p>
+                          </div>
+                        ) : (
+                          <div className="space-y-3">
+                            {searchResults.slice(0, 30).map((item) => (
+                              <button
+                                key={item.id}
+                                onClick={() => selectSearchItem(item.id, item.name)}
+                                className="w-full text-left bg-white rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-lg hover:shadow-orange-500/5 transition-all p-4"
+                              >
+                                <div className="flex items-center justify-between gap-4">
+                                  <div className="min-w-0">
+                                    <p className="text-sm font-black text-gray-900 truncate">{item.name}</p>
+                                    <p className="text-xs font-medium text-gray-500 truncate mt-1">{item.category || 'Geral'}</p>
+                                  </div>
+                                  <div className="text-sm font-black text-orange-600 whitespace-nowrap">{Number(item.price || 0).toFixed(0)} MT</div>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Sticky Category Navigation */}
           {!searchTerm && (
@@ -461,13 +603,14 @@ export default function RestaurantDetailPage() {
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                       {filteredItems.map((item) => (
-                        <ProductCard
-                          key={item.id}
-                          item={item}
-                          quantity={getCartQuantity(item.id)}
-                          onAdd={() => addToCart(item.id, item.price, item.name)}
-                          onRemove={() => removeFromCart(item.id)}
-                        />
+                        <div key={item.id} id={`product-${item.id}`}>
+                          <ProductCard
+                            item={item}
+                            quantity={getCartQuantity(item.id)}
+                            onAdd={() => addToCart(item.id, item.price, item.name)}
+                            onRemove={() => removeFromCart(item.id)}
+                          />
+                        </div>
                       ))}
                     </div>
                   </section>
