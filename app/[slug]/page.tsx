@@ -483,40 +483,26 @@ export default function RestaurantDetailPage() {
             </div>
 
             {isSearchMode && (
-              <div className="mt-4 bg-white rounded-[1.5rem] border border-gray-100 shadow-sm overflow-hidden">
-                <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
-                  <p className="text-xs font-black uppercase tracking-widest text-gray-400">
-                    {normalizedSearch ? 'Resultados' : 'Sugestões'}
-                  </p>
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
-                    {normalizedSearch ? searchResults.length : suggestionResults.length}
-                  </p>
-                </div>
-
-                <div className="max-h-[60vh] overflow-y-auto">
-                  {normalizedSearch && searchResults.length === 0 ? (
-                    <div className="py-14 text-center opacity-50">
-                      <Search className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                      <p className="font-black uppercase text-xs tracking-[0.3em]">Nenhum item encontrado</p>
-                    </div>
-                  ) : (
-                    (normalizedSearch ? searchResults.slice(0, 30) : suggestionResults).map((item) => (
-                      <button
-                        key={item.id}
-                        onClick={() => selectSearchItem(item.id, item.name)}
-                        className="w-full text-left px-6 py-4 border-b border-gray-50 hover:bg-orange-50/40 transition-colors"
-                      >
-                        <div className="flex items-center justify-between gap-4">
-                          <div className="min-w-0">
-                            <p className="text-sm font-black text-gray-900 truncate">{item.name}</p>
-                            <p className="text-xs font-medium text-gray-500 truncate mt-1">{item.category || 'Geral'}</p>
-                          </div>
-                          <div className="text-sm font-black text-orange-600 whitespace-nowrap">{Number(item.price || 0).toFixed(0)} MT</div>
-                        </div>
-                      </button>
-                    ))
-                  )}
-                </div>
+              <div className="mt-4">
+                {normalizedSearch && searchResults.length === 0 ? (
+                  <div className="text-center py-20 opacity-30">
+                    <Search className="w-20 h-20 mx-auto mb-4 text-gray-300" />
+                    <p className="font-black uppercase text-xs tracking-[0.3em]">Nenhum item encontrado</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {(normalizedSearch ? searchResults.slice(0, 30) : catalog.slice(0, 12)).map((item) => (
+                      <div key={item.id} id={`product-${item.id}`}>
+                        <ProductCard
+                          item={item}
+                          quantity={getCartQuantity(item.id)}
+                          onAdd={() => addToCart(item.id, item.price, item.name)}
+                          onRemove={() => removeFromCart(item.id)}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>
