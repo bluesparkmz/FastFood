@@ -131,18 +131,31 @@ export default function ProfilePage() {
                     </div>
 
                     <div className="px-6 pb-6 grid grid-cols-1 gap-3">
-                        <button
-                            onClick={handleEditOnSkyVenda}
-                            className={cn(
-                                'w-full h-12 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-all',
-                                'bg-gray-900 text-white hover:bg-black active:scale-[0.99]'
-                            )}
-                        >
-                            <span>Editar na SkyVenda</span>
-                            <ExternalLink className="w-4 h-4" />
-                        </button>
+                        {isLoggedIn ? (
+                            <>
+                                <button
+                                    onClick={handleEditOnSkyVenda}
+                                    className={cn(
+                                        'w-full h-12 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-all',
+                                        'bg-gray-900 text-white hover:bg-black active:scale-[0.99]'
+                                    )}
+                                >
+                                    <span>Editar na SkyVenda</span>
+                                    <ExternalLink className="w-4 h-4" />
+                                </button>
 
-                        {!isLoggedIn ? (
+                                <button
+                                    onClick={logout}
+                                    className={cn(
+                                        'w-full h-12 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-all',
+                                        'bg-red-50 text-red-600 hover:bg-red-100 active:scale-[0.99]'
+                                    )}
+                                >
+                                    <span>Sair</span>
+                                    <LogOut className="w-4 h-4" />
+                                </button>
+                            </>
+                        ) : (
                             <button
                                 onClick={() => router.push('/login?next=/profile')}
                                 className={cn(
@@ -150,19 +163,8 @@ export default function ProfilePage() {
                                     'bg-orange-500 text-white hover:bg-orange-600 active:scale-[0.99]'
                                 )}
                             >
-                                <span>Entrar</span>
+                                <span>Fazer login</span>
                                 <LogIn className="w-4 h-4" />
-                            </button>
-                        ) : (
-                            <button
-                                onClick={logout}
-                                className={cn(
-                                    'w-full h-12 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-all',
-                                    'bg-red-50 text-red-600 hover:bg-red-100 active:scale-[0.99]'
-                                )}
-                            >
-                                <span>Sair</span>
-                                <LogOut className="w-4 h-4" />
                             </button>
                         )}
                     </div>
