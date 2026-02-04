@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { notFound, redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import type { Restaurant } from '@/types/fastfood';
 import { base_url } from '@/api/api';
 
@@ -34,8 +34,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL || 'https://fastfood.skyvenda.com';
+  const siteUrl = 'https://fastfood.skyvenda.com';
   const canonicalUrl = `${siteUrl}/${restaurant.slug || params.slug}`;
 
   const imageUrl = restaurant.cover_image
@@ -84,8 +83,22 @@ export default async function ShareRestaurantPage({ params }: PageProps) {
     notFound();
   }
 
-  // Depois de os crawlers lerem os meta tags dessa rota,
-  // o utilizador humano é redirecionado para a página cliente normal.
-  redirect(`/${restaurant.slug || params.slug}`);
+  // Determine redirect URL
+  const targetUrl = `/${restaurant.slug || params.slug}`;
+
+  // Client-side redirect to allow crawlers to read metadata first
+  return (
+    <>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            if (typeof window !== "undefined") {
+              window.location.replace(${JSON.stringify(targetUrl)});
+            }
+          `,
+        }}
+      />
+    </>
+  );
 }
 

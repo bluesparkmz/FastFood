@@ -18,7 +18,11 @@ const BottomNav = () => {
         { icon: User, label: 'Perfil', path: '/profile' },
     ];
 
-    if (pathname?.startsWith('/restaurantes')) {
+    if (
+        pathname?.startsWith('/restaurantes') ||
+        pathname === '/help' ||
+        pathname === '/privacy'
+    ) {
         return null;
     }
 

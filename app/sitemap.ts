@@ -65,6 +65,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
             changeFrequency: 'monthly',
             priority: 0.5,
         },
+        {
+            url: `${BASE_URL}/privacy`,
+            lastModified: now,
+            changeFrequency: 'yearly',
+            priority: 0.3,
+        },
+        {
+            url: `${BASE_URL}/help`,
+            lastModified: now,
+            changeFrequency: 'monthly',
+            priority: 0.4,
+        },
     ];
 
     // Province routes
