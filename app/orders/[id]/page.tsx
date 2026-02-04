@@ -184,6 +184,9 @@ export default function OrderDetailsPage() {
                                 day: '2-digit', month: 'long', hour: '2-digit', minute: '2-digit'
                             })}
                         </p>
+                        <div className="mt-2 text-xs font-bold uppercase tracking-widest text-orange-500">
+                            {order.order_type === 'distance' ? '🛵 Entrega' : '🍽️ Local'}
+                        </div>
                     </div>
                 </div>
             </div>

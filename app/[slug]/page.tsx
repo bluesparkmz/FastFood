@@ -296,9 +296,15 @@ export default function RestaurantDetailPage() {
 
     if (cart.size === 0) return;
 
-    if (orderType === 'distance' && !deliveryAddress.trim()) {
-      toast.error('Informe o endereço de entrega');
-      return;
+    if (orderType === 'distance') {
+      if (!deliveryAddress.trim()) {
+        toast.error('Informe o endereço de entrega');
+        return;
+      }
+      if (deliveryAddress.trim().length < 5) {
+        toast.error('O endereço de entrega deve ser mais detalhado');
+        return;
+      }
     }
 
     try {

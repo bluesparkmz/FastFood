@@ -146,7 +146,7 @@ export const fastfoodApi = {
 
   // ========== Tables ==========
   async getTables(restaurantId: number): Promise<RestaurantTable[]> {
-    const response = await api.get(`/fastfood/restaurants/${restaurantId}/tables`);
+    const response = await api.get(`/fastfood/restaurants/${restaurantId}/tables/public`);
     return response.data;
   },
 
