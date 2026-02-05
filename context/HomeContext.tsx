@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import fastfoodApi from '@/api/fastfoodApi';
 import type { Restaurant } from '@/types/fastfood';
 
@@ -43,6 +43,7 @@ export function HomeProvider({ children }: { children: React.ReactNode }) {
     const [hasLoadedInitially, setHasLoadedInitially] = useState(false);
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
+    const isFetchingRef = useRef(false);
 
     const LIMIT = 10;
 
@@ -127,11 +128,14 @@ export function HomeProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     const fetchData = useCallback(async (forced = false) => {
+        if (isFetchingRef.current) return;
+
         if (hasLoadedInitially && !forced && !searchQuery && !selectedCategory && !selectedProvince && exploreData) {
             return;
         }
 
         try {
+            isFetchingRef.current = true;
             setLoading(true);
             setPage(0);
             setHasMore(true);
@@ -180,8 +184,9 @@ export function HomeProvider({ children }: { children: React.ReactNode }) {
             console.error('Error fetching home data:', error);
         } finally {
             setLoading(false);
+            isFetchingRef.current = false;
         }
-    }, [searchQuery, selectedCategory, selectedProvince, hasLoadedInitially, exploreData]);
+    }, [searchQuery, selectedCategory, selectedProvince, selectedDistrict, hasLoadedInitially, exploreData]);
 
     const loadMore = async () => {
         if (loadingMore || !hasMore || searchQuery || selectedCategory) return;

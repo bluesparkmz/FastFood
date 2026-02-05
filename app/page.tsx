@@ -363,7 +363,12 @@ export default function FastFoodPage() {
               </div>
             ) : (
               <div className="flex gap-4 overflow-x-auto hide-scrollbar -mx-4 px-4 pb-4">
-                {pagedRestaurants.length > 0 ? (
+                {loading ? (
+                  // Province Skeletons (using similar style to district)
+                  [...Array(3)].map((_, i) => (
+                    <div key={i} className="flex-shrink-0 w-64 h-48 bg-gray-100 rounded-3xl animate-pulse" />
+                  ))
+                ) : pagedRestaurants.length > 0 ? (
                   pagedRestaurants.slice(0, 6).map((res: Restaurant) => (
                     <Link
                       key={`prov-res-${res.id}`}
