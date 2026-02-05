@@ -10,6 +10,7 @@ import {
 import Image from 'next/image';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import fastfoodApi from '@/api/fastfoodApi';
+import LikeButton from '@/components/fastfood/LikeButton';
 import type { Restaurant, FastFoodOrder, RestaurantTable, Tab, CatalogProduct } from '@/types/fastfood';
 import toast from 'react-hot-toast';
 import { getImageUrl, getMultipleImageUrls, isEmoji } from '@/utils/imageUtils';
@@ -430,6 +431,15 @@ export default function RestaurantDetailPage() {
                     </span>
                     <span>•</span>
                     <span>{restaurant.category || 'Restaurante'}</span>
+                    <span>•</span>
+                    <div className="flex items-center gap-2 pointer-events-auto">
+                      <LikeButton
+                        restaurantId={restaurant.id}
+                        initialLikes={restaurant.likes}
+                        initialLiked={restaurant.user_liked}
+                        size="sm"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>

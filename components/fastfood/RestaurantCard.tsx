@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Clock, MapPin, Star, ChevronRight, ShieldCheck, Heart } from 'lucide-react';
+import { Clock, MapPin, Star, ChevronRight, ShieldCheck } from 'lucide-react';
 import type { Restaurant } from '@/types/fastfood';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -48,41 +48,7 @@ export default function RestaurantCard({ restaurant, isLoading }: RestaurantCard
   const defaultImage = '/images/restaurant-placeholder.svg';
   const imageUrl = getImageUrl(restaurant.cover_image) || defaultImage;
 
-  const [isFavorite, setIsFavorite] = useState(false);
 
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem('favorite_restaurants');
-      const ids = raw ? (JSON.parse(raw) as unknown) : [];
-      if (Array.isArray(ids)) {
-        setIsFavorite(ids.map((x) => Number(x)).includes(Number(restaurant.id)));
-      }
-    } catch {
-      setIsFavorite(false);
-    }
-  }, [restaurant.id]);
-
-  const toggleFavorite = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    try {
-      const raw = localStorage.getItem('favorite_restaurants');
-      const current = raw ? (JSON.parse(raw) as unknown) : [];
-      const set = new Set<number>(Array.isArray(current) ? current.map((x) => Number(x)) : []);
-      const id = Number(restaurant.id);
-      if (set.has(id)) {
-        set.delete(id);
-        setIsFavorite(false);
-      } else {
-        set.add(id);
-        setIsFavorite(true);
-      }
-      localStorage.setItem('favorite_restaurants', JSON.stringify(Array.from(set)));
-      window.dispatchEvent(new CustomEvent('fastfood-favorites-changed'));
-    } catch {
-    }
-  };
 
   return (
     <motion.div
@@ -103,19 +69,14 @@ export default function RestaurantCard({ restaurant, isLoading }: RestaurantCard
               }}
             />
 
-            <button
-              onClick={toggleFavorite}
-              className={cn(
-                "absolute top-3 right-3 w-10 h-10 rounded-2xl flex items-center justify-center border transition-all",
-                isFavorite
-                  ? "bg-red-600 border-red-600 text-white shadow-lg shadow-red-500/20"
-                  : "bg-white/90 backdrop-blur border-white/60 text-gray-700 hover:bg-white"
-              )}
-              aria-label={isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
-              title={isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
-            >
-              <Heart className={cn("w-5 h-5", isFavorite ? "fill-white" : "")} />
-            </button>
+            <div className="absolute top-3 right-3 z-10">
+              <LikeButton
+                restaurantId={restaurant.id}
+                initialLikes={restaurant.likes || 0}
+                initialLiked={restaurant.user_liked}
+                size="sm"
+              />
+            </div>
 
             {/* Overlay Status */}
             {!restaurant.is_open && (
