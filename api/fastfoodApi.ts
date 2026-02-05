@@ -221,6 +221,21 @@ export const fastfoodApi = {
     return response.data;
   },
 
+  async getPopularRestaurants(params: { province?: string, district?: string, limit?: number }): Promise<Restaurant[]> {
+    const response = await api.get('/fastfood/restaurants/popular', { params });
+    return response.data;
+  },
+
+  async getNewRestaurants(params: { province?: string, district?: string, limit?: number }): Promise<Restaurant[]> {
+    const response = await api.get('/fastfood/restaurants/new', { params });
+    return response.data;
+  },
+
+  async getNearbyRestaurants(params: { lat?: number, lng?: number, province?: string, district?: string, limit?: number }): Promise<Restaurant[]> {
+    const response = await api.get('/fastfood/restaurants/nearby', { params });
+    return response.data;
+  },
+
   // ========== Profile & Auth ==========
   async getProfile(): Promise<any> {
     const response = await api.get('/user/profile');

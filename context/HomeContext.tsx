@@ -148,13 +148,29 @@ export function HomeProvider({ children }: { children: React.ReactNode }) {
                 setRestaurants(restaurantData);
                 setPagedRestaurants([]);
             } else {
-                const [explore, allRes, distRes] = await Promise.all([
-                    fastfoodApi.getExploreFeed(selectedProvince || undefined),
+                // Individual calls for each section
+                const [popular, newRes, allRes, distRes] = await Promise.all([
+                    fastfoodApi.getPopularRestaurants({
+                        province: selectedProvince || undefined,
+                        limit: 6
+                    }),
+                    fastfoodApi.getNewRestaurants({
+                        province: selectedProvince || undefined,
+                        limit: 6
+                    }),
                     fastfoodApi.getRestaurants(0, LIMIT, selectedProvince || undefined),
-                    selectedDistrict ? fastfoodApi.searchRestaurants({ district: selectedDistrict }) : Promise.resolve([])
+                    selectedDistrict ? fastfoodApi.getNearbyRestaurants({
+                        district: selectedDistrict,
+                        province: selectedProvince || undefined,
+                        limit: 6
+                    }) : Promise.resolve([])
                 ]);
-                setExploreData(explore);
-                setRestaurants(explore.popular_restaurants);
+
+                setExploreData({
+                    popular_restaurants: popular,
+                    new_restaurants: newRes
+                });
+                setRestaurants(popular);
                 setPagedRestaurants(allRes);
                 setDistrictRestaurants(distRes);
                 if (allRes.length < LIMIT) setHasMore(false);
