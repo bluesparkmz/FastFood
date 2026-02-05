@@ -86,13 +86,13 @@ export default function PromoBanner({ slides, autoPlayInterval = 5000 }: PromoBa
                             }} />
                         </div>
 
-                        {/* Content Container */}
-                        <div className="relative h-full flex-1 flex flex-col justify-center pr-4 z-10">
+                        {/* Left Side: Content */}
+                        <div className="relative z-10 flex flex-col gap-2 md:gap-4 max-w-[65%]">
                             <motion.span
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: 0.2 }}
-                                className="text-white/80 text-[10px] font-black uppercase tracking-[0.3em] mb-2"
+                                className="text-orange-100 text-[10px] md:text-sm font-black uppercase tracking-[0.2em] drop-shadow-sm"
                             >
                                 {currentSlide.subtitle}
                             </motion.span>
@@ -100,25 +100,24 @@ export default function PromoBanner({ slides, autoPlayInterval = 5000 }: PromoBa
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.3 }}
-                                className="text-white text-2xl md:text-4xl lg:text-5xl font-black leading-tight mb-6 drop-shadow-md tracking-tighter max-w-2xl"
+                                className="text-white text-lg md:text-4xl lg:text-5xl font-black leading-tight mb-2 md:mb-6 drop-shadow-md tracking-tighter max-w-2xl"
                             >
                                 {currentSlide.title}
                             </motion.h2>
-
                             <motion.button
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
                                 transition={{ delay: 0.4 }}
                                 onClick={currentSlide.onAction}
-                                className="w-fit flex items-center gap-2 px-6 py-3 md:px-8 md:py-4 bg-white hover:bg-orange-50 text-orange-600 rounded-2xl font-black text-xs md:text-sm uppercase tracking-widest shadow-xl transition-all active:scale-95 group/btn"
+                                className="w-fit flex items-center gap-2 px-4 py-2 md:px-8 md:py-4 bg-white hover:bg-orange-50 text-orange-600 rounded-xl md:rounded-2xl font-black text-[10px] md:text-sm uppercase tracking-widest shadow-xl transition-all active:scale-95 group/btn"
                             >
                                 Pedir Agora
-                                <ChevronRight className="w-4 h-4 md:w-5 md:h-5 group-hover/btn:translate-x-1 transition-transform" />
+                                <ChevronRight className="w-3 h-3 md:w-5 md:h-5 group-hover/btn:translate-x-1 transition-transform" />
                             </motion.button>
                         </div>
 
                         {/* Right Side: Image & Badge */}
-                        <div className="relative flex-shrink-0 w-[160px] h-[160px] md:w-[280px] md:h-[280px] lg:w-[320px] lg:h-[320px]">
+                        <div className="relative flex-shrink-0 w-[120px] h-[120px] md:w-[280px] md:h-[280px] lg:w-[320px] lg:h-[320px]">
                             {/* Discount Badge */}
                             {currentSlide.discount && (
                                 <motion.div
