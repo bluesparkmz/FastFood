@@ -32,13 +32,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt">
-      <body className="antialiased font-sans">
+      <body className="antialiased font-sans overflow-x-hidden">
         <AuthProvider>
           <WebSocketProvider>
             <HomeProvider>
-              <div className="flex min-h-screen">
+              <div className="min-h-screen">
                 <DesktopSidebar />
-                <main className="flex-1 md:pl-64 lg:pl-72 transition-all duration-300">
+                <main className="md:pl-64 lg:pl-72 transition-all duration-300">
                   {children}
                   <Toaster position="top-center" />
                 </main>
