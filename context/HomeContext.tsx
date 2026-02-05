@@ -9,6 +9,10 @@ interface HomeContextType {
     pagedRestaurants: Restaurant[];
     exploreData: any;
     loading: boolean;
+    loadingPopular: boolean;
+    loadingNew: boolean;
+    loadingDistrict: boolean;
+    loadingPaged: boolean;
     loadingMore: boolean;
     searchQuery: string;
     setSearchQuery: (query: string) => void;
@@ -33,6 +37,10 @@ export function HomeProvider({ children }: { children: React.ReactNode }) {
     const [pagedRestaurants, setPagedRestaurants] = useState<Restaurant[]>([]);
     const [exploreData, setExploreData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [loadingPopular, setLoadingPopular] = useState(false);
+    const [loadingNew, setLoadingNew] = useState(false);
+    const [loadingDistrict, setLoadingDistrict] = useState(false);
+    const [loadingPaged, setLoadingPaged] = useState(false);
     const [loadingMore, setLoadingMore] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
@@ -130,13 +138,17 @@ export function HomeProvider({ children }: { children: React.ReactNode }) {
     const fetchData = useCallback(async (forced = false) => {
         if (isFetchingRef.current) return;
 
-        if (hasLoadedInitially && !forced && !searchQuery && !selectedCategory && !selectedProvince && exploreData) {
+        if (hasLoadedInitially && !forced && !searchQuery && !selectedCategory && !selectedProvince && !selectedDistrict && exploreData) {
             return;
         }
 
         try {
             isFetchingRef.current = true;
-            setLoading(true);
+            // General loading state for search/category filters
+            if (searchQuery || selectedCategory) {
+                setLoading(true);
+            }
+
             setPage(0);
             setHasMore(true);
 
@@ -144,6 +156,8 @@ export function HomeProvider({ children }: { children: React.ReactNode }) {
                 const results = await fastfoodApi.searchAll(searchQuery);
                 setRestaurants(results.restaurants);
                 setPagedRestaurants([]);
+                setExploreData(null);
+                setLoading(false);
             } else if (selectedCategory || (selectedProvince && forced)) {
                 const params: any = {};
                 if (selectedCategory) params.category = selectedCategory;
@@ -151,39 +165,90 @@ export function HomeProvider({ children }: { children: React.ReactNode }) {
                 const restaurantData = await fastfoodApi.searchRestaurants(params);
                 setRestaurants(restaurantData);
                 setPagedRestaurants([]);
+                setExploreData(null);
+                setLoading(false);
             } else {
-                // Individual calls for each section
-                const [popular, newRes, allRes, distRes] = await Promise.all([
-                    fastfoodApi.getPopularRestaurants({
-                        province: selectedProvince || undefined,
-                        limit: 6
-                    }),
-                    fastfoodApi.getNewRestaurants({
-                        province: selectedProvince || undefined,
-                        limit: 6
-                    }),
-                    fastfoodApi.getRestaurants(0, LIMIT, selectedProvince || undefined),
-                    selectedDistrict ? fastfoodApi.getNearbyRestaurants({
-                        district: selectedDistrict,
-                        province: selectedProvince || undefined,
-                        limit: 6
-                    }) : Promise.resolve([])
-                ]);
+                // INDEPENDENT LOADS FOR SECTIONS
+                setLoadingPopular(true);
+                setLoadingNew(true);
+                setLoadingPaged(true);
+                setLoadingDistrict(!!selectedDistrict);
 
-                setExploreData({
-                    popular_restaurants: popular,
-                    new_restaurants: newRes
-                });
-                setRestaurants(popular);
-                setPagedRestaurants(allRes);
-                setDistrictRestaurants(distRes);
-                if (allRes.length < LIMIT) setHasMore(false);
+                // Popular Section
+                const fetchPopular = async () => {
+                    try {
+                        const popular = await fastfoodApi.getPopularRestaurants({
+                            province: selectedProvince || undefined,
+                            limit: 6
+                        });
+                        setExploreData((prev: any) => ({ ...prev, popular_restaurants: popular }));
+                        setRestaurants(popular);
+                    } finally {
+                        setLoadingPopular(false);
+                    }
+                };
+
+                // New Section
+                const fetchNew = async () => {
+                    try {
+                        const newRes = await fastfoodApi.getNewRestaurants({
+                            province: selectedProvince || undefined,
+                            limit: 6
+                        });
+                        setExploreData((prev: any) => ({ ...prev, new_restaurants: newRes }));
+                    } finally {
+                        setLoadingNew(false);
+                    }
+                };
+
+                // Paged Section (Main Feed)
+                const fetchPaged = async () => {
+                    try {
+                        const allRes = await fastfoodApi.getRestaurants(0, LIMIT, selectedProvince || undefined);
+                        setPagedRestaurants(allRes);
+                        if (allRes.length < LIMIT) setHasMore(false);
+                    } finally {
+                        setLoadingPaged(false);
+                    }
+                };
+
+                // District Section
+                const fetchDistrict = async () => {
+                    if (!selectedDistrict) {
+                        setDistrictRestaurants([]);
+                        setLoadingDistrict(false);
+                        return;
+                    }
+                    try {
+                        const distRes = await fastfoodApi.getNearbyRestaurants({
+                            district: selectedDistrict,
+                            province: selectedProvince || undefined,
+                            limit: 6
+                        });
+                        setDistrictRestaurants(distRes);
+                    } finally {
+                        setLoadingDistrict(false);
+                    }
+                };
+
+                // Trigger all in parallel without blocking each other
+                fetchPopular();
+                fetchNew();
+                fetchPaged();
+                fetchDistrict();
+
+                // Set overall loading to false once triggers are out
+                setLoading(false);
             }
             setHasLoadedInitially(true);
         } catch (error: any) {
             console.error('Error fetching home data:', error);
-        } finally {
             setLoading(false);
+            setLoadingPopular(false);
+            setLoadingNew(false);
+            setLoadingPaged(false);
+            setLoadingDistrict(false);
+        } finally {
             isFetchingRef.current = false;
         }
     }, [searchQuery, selectedCategory, selectedProvince, selectedDistrict, hasLoadedInitially, exploreData]);
@@ -222,7 +287,7 @@ export function HomeProvider({ children }: { children: React.ReactNode }) {
         if (hasLoadedInitially) {
             fetchData();
         }
-    }, [searchQuery, selectedCategory, selectedProvince]);
+    }, [searchQuery, selectedCategory, selectedProvince, selectedDistrict]);
 
     const refreshData = () => fetchData(true);
 
@@ -232,6 +297,10 @@ export function HomeProvider({ children }: { children: React.ReactNode }) {
             pagedRestaurants,
             exploreData,
             loading,
+            loadingPopular,
+            loadingNew,
+            loadingDistrict,
+            loadingPaged,
             loadingMore,
             searchQuery,
             setSearchQuery,

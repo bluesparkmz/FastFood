@@ -45,6 +45,10 @@ export default function FastFoodPage() {
     pagedRestaurants,
     exploreData,
     loading,
+    loadingPopular,
+    loadingNew,
+    loadingDistrict,
+    loadingPaged,
     loadingMore,
     searchQuery,
     setSearchQuery,
@@ -53,6 +57,7 @@ export default function FastFoodPage() {
     selectedProvince,
     setSelectedProvince,
     selectedDistrict,
+    setSelectedDistrict,
     districtRestaurants,
     loadMore,
     hasMore,
@@ -193,8 +198,8 @@ export default function FastFoodPage() {
 
 
         {/* Popular / Suggested Restaurants Section */}
-        {!searchQuery && !selectedCategory && (loading || restaurants.length > 0) && (
-          loading ? (
+        {!searchQuery && !selectedCategory && (loadingPopular || (restaurants && restaurants.length > 0)) && (
+          loadingPopular ? (
             <SuggestedSkeleton />
           ) : (
             <section className="mb-12">
@@ -238,9 +243,9 @@ export default function FastFoodPage() {
           )
         )}
 
-        {/* Popular Restaurants Section (Alternative view or hidden if using suggested row) */}
-        {!searchQuery && !selectedCategory && (loading || exploreData?.new_restaurants?.length > 0) && (
-          loading ? (
+        {/* New Restaurants Section */}
+        {!searchQuery && !selectedCategory && (loadingNew || (exploreData?.new_restaurants && exploreData?.new_restaurants?.length > 0)) && (
+          loadingNew ? (
             <NewRestaurantsSkeleton />
           ) : (
             <section className="mb-12">
@@ -286,7 +291,7 @@ export default function FastFoodPage() {
             </div>
 
             <div className="flex gap-4 overflow-x-auto hide-scrollbar -mx-4 px-4 pb-4">
-              {loading ? (
+              {loadingDistrict ? (
                 // District Skeletons
                 [...Array(3)].map((_, i) => (
                   <div key={i} className="flex-shrink-0 w-64 h-48 bg-gray-100 rounded-[2.5rem] animate-pulse" />
@@ -363,7 +368,7 @@ export default function FastFoodPage() {
               </div>
             ) : (
               <div className="flex gap-4 overflow-x-auto hide-scrollbar -mx-4 px-4 pb-4">
-                {loading ? (
+                {loadingPaged ? (
                   // Province Skeletons (using similar style to district)
                   [...Array(3)].map((_, i) => (
                     <div key={i} className="flex-shrink-0 w-64 h-48 bg-gray-100 rounded-3xl animate-pulse" />
@@ -403,8 +408,8 @@ export default function FastFoodPage() {
         )}
 
         {/* Explore All Restaurants Section (Infinite Scroll) */}
-        {!searchQuery && !selectedCategory && (loading || pagedRestaurants.length > 0) && (
-          loading ? (
+        {!searchQuery && !selectedCategory && (loadingPaged || pagedRestaurants.length > 0) && (
+          loadingPaged ? (
             <RestaurantGridSkeleton />
           ) : (
             <section className="mb-20">
