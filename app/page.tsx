@@ -98,7 +98,7 @@ export default function FastFoodPage() {
       {/* Localized Home Header */}
       <header
         className={cn(
-          "sticky top-0 left-0 w-full z-50 transition-all duration-300 px-6 py-4 flex items-center justify-between md:hidden",
+          "sticky top-0 left-0 w-full z-50 transition-all duration-300 px-6 py-4 flex items-center justify-between",
           isScrolled ? "bg-white/90 backdrop-blur-xl border-b border-gray-100 shadow-sm" : "bg-white"
         )}
       >
