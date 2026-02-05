@@ -16,7 +16,7 @@ export const CategorySkeleton = () => (
 );
 
 export const HeroSkeleton = () => (
-    <div className="w-full h-[200px] rounded-2xl bg-gray-200 animate-pulse" />
+    <div className="w-full h-[200px] md:h-[350px] lg:h-[400px] rounded-[2.5rem] md:rounded-[3rem] bg-gray-200 animate-pulse" />
 );
 
 export const SuggestedSkeleton = () => (

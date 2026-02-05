@@ -59,7 +59,7 @@ export default function PromoBanner({ slides, autoPlayInterval = 5000 }: PromoBa
     };
 
     return (
-        <div className="relative w-full h-[200px] group overflow-hidden rounded-[2.5rem]">
+        <div className="relative w-full h-[200px] md:h-[350px] lg:h-[400px] group overflow-hidden rounded-[2.5rem] md:rounded-[3rem]">
             <AnimatePresence initial={false} custom={direction} mode="wait">
                 <motion.div
                     key={currentIndex}
@@ -74,7 +74,7 @@ export default function PromoBanner({ slides, autoPlayInterval = 5000 }: PromoBa
                     }}
                     className="absolute inset-0 w-full h-full"
                 >
-                    <div className="relative w-full h-full p-6 flex items-center justify-between overflow-hidden shadow-xl shadow-orange-500/10">
+                    <div className="relative w-full h-full p-6 md:p-12 lg:p-16 flex items-center justify-between overflow-hidden shadow-xl shadow-orange-500/10">
                         {/* Orange Gradient Background */}
                         <div className="absolute inset-0 bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600" />
 
@@ -100,7 +100,7 @@ export default function PromoBanner({ slides, autoPlayInterval = 5000 }: PromoBa
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.3 }}
-                                className="text-white text-2xl md:text-3xl font-black leading-none mb-6 drop-shadow-md tracking-tighter"
+                                className="text-white text-2xl md:text-4xl lg:text-5xl font-black leading-tight mb-6 drop-shadow-md tracking-tighter max-w-2xl"
                             >
                                 {currentSlide.title}
                             </motion.h2>
@@ -110,15 +110,15 @@ export default function PromoBanner({ slides, autoPlayInterval = 5000 }: PromoBa
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.4 }}
                                 onClick={currentSlide.onAction}
-                                className="w-fit flex items-center gap-2 px-6 py-3 bg-white hover:bg-orange-50 text-orange-600 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl transition-all active:scale-95 group/btn"
+                                className="w-fit flex items-center gap-2 px-6 py-3 md:px-8 md:py-4 bg-white hover:bg-orange-50 text-orange-600 rounded-2xl font-black text-xs md:text-sm uppercase tracking-widest shadow-xl transition-all active:scale-95 group/btn"
                             >
                                 Pedir Agora
-                                <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                                <ChevronRight className="w-4 h-4 md:w-5 md:h-5 group-hover/btn:translate-x-1 transition-transform" />
                             </motion.button>
                         </div>
 
                         {/* Right Side: Image & Badge */}
-                        <div className="relative flex-shrink-0 w-[160px] h-[160px] md:w-[180px] md:h-[180px]">
+                        <div className="relative flex-shrink-0 w-[160px] h-[160px] md:w-[280px] md:h-[280px] lg:w-[320px] lg:h-[320px]">
                             {/* Discount Badge */}
                             {currentSlide.discount && (
                                 <motion.div
@@ -163,8 +163,8 @@ export default function PromoBanner({ slides, autoPlayInterval = 5000 }: PromoBa
                         key={i}
                         onClick={() => goToSlide(i)}
                         className={`h-1.5 rounded-full transition-all duration-300 ${i === currentIndex
-                                ? 'bg-white w-6 shadow-sm'
-                                : 'bg-white/40 w-1.5 hover:bg-white/60'
+                            ? 'bg-white w-6 shadow-sm'
+                            : 'bg-white/40 w-1.5 hover:bg-white/60'
                             }`}
                         aria-label={`Ir para slide ${i + 1}`}
                     />
