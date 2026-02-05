@@ -262,12 +262,6 @@ export interface TabUpdate {
 }
 
 export interface ExploreFeed {
-  featured_products?: (CatalogProduct & {
-    restaurant_id: number;
-    restaurant_name: string;
-    restaurant_slug: string | null;
-    restaurant_cover_image: string | null;
-  })[];
   popular_restaurants: Restaurant[];
   new_restaurants: Restaurant[];
 }
