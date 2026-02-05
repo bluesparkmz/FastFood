@@ -45,6 +45,7 @@ export default function FastFoodPage() {
     pagedRestaurants,
     exploreData,
     loading,
+    loadingHero,
     loadingPopular,
     loadingNew,
     loadingDistrict,
@@ -129,7 +130,7 @@ export default function FastFoodPage() {
 
       {/* Hero / Promo Section */}
       <section className="px-4 py-3">
-        {loading ? (
+        {loadingHero ? (
           <HeroSkeleton />
         ) : (
           <PromoBanner

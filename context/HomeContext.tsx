@@ -9,6 +9,7 @@ interface HomeContextType {
     pagedRestaurants: Restaurant[];
     exploreData: any;
     loading: boolean;
+    loadingHero: boolean;
     loadingPopular: boolean;
     loadingNew: boolean;
     loadingDistrict: boolean;
@@ -37,6 +38,7 @@ export function HomeProvider({ children }: { children: React.ReactNode }) {
     const [pagedRestaurants, setPagedRestaurants] = useState<Restaurant[]>([]);
     const [exploreData, setExploreData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [loadingHero, setLoadingHero] = useState(true);
     const [loadingPopular, setLoadingPopular] = useState(false);
     const [loadingNew, setLoadingNew] = useState(false);
     const [loadingDistrict, setLoadingDistrict] = useState(false);
@@ -280,6 +282,11 @@ export function HomeProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         if (!hasLoadedInitially) {
             detectLocation().finally(() => fetchData());
+            // Emulate hero loading for 2 seconds
+            const timer = setTimeout(() => {
+                setLoadingHero(false);
+            }, 2000);
+            return () => clearTimeout(timer);
         }
     }, [detectLocation, hasLoadedInitially, fetchData]);
 
@@ -297,6 +304,7 @@ export function HomeProvider({ children }: { children: React.ReactNode }) {
             pagedRestaurants,
             exploreData,
             loading,
+            loadingHero,
             loadingPopular,
             loadingNew,
             loadingDistrict,

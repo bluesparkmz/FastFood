@@ -3,11 +3,12 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import BottomNav from "@/components/fastfood/BottomNav";
 import CookieConsent from "@/components/fastfood/CookieConsent";
-import Header from "@/components/fastfood/Header";
 import { HomeProvider } from "@/context/HomeContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { WebSocketProvider } from "@/context/WebSocketContext";
 import { Toaster } from "react-hot-toast";
+import DesktopSidebar from "@/components/fastfood/DesktopSidebar";
+import Header from "@/components/fastfood/Header";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,10 +36,13 @@ export default function RootLayout({
         <AuthProvider>
           <WebSocketProvider>
             <HomeProvider>
-              <main>
-                {children}
-                <Toaster position="top-center" />
-              </main>
+              <div className="flex min-h-screen">
+                <DesktopSidebar />
+                <main className="flex-1 md:pl-64 lg:pl-72 transition-all duration-300">
+                  {children}
+                  <Toaster position="top-center" />
+                </main>
+              </div>
             </HomeProvider>
           </WebSocketProvider>
         </AuthProvider>
