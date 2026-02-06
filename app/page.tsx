@@ -9,9 +9,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import RestaurantCard from '@/components/fastfood/RestaurantCard';
-import fastfoodApi from '@/api/fastfoodApi';
 import type { Restaurant } from '@/types/fastfood';
-import toast from 'react-hot-toast';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import PromoBanner from '@/components/fastfood/PromoBanner';
@@ -19,7 +17,6 @@ import { getImageUrl } from '@/utils/imageUtils';
 import {
   CategorySkeleton,
   HeroSkeleton,
-  SuggestedSkeleton,
   NewRestaurantsSkeleton,
   RestaurantGridSkeleton
 } from '@/components/fastfood/Skeletons';
@@ -170,12 +167,12 @@ export default function FastFoodPage() {
               {sponsoredRestaurants.map((ad: any) => (
                 <Link
                   key={`sponsored-${ad.id}`}
-                  href={ad.restaurant_slug ? `/${ad.restaurant_slug}` : `/restaurant/${ad.restaurant_id}`}
+                  href={ad.link || (ad.restaurant_slug ? `/${ad.restaurant_slug}` : `/restaurant/${ad.restaurant_id}`)}
                   className="flex-shrink-0 md:w-[240px] w-[140px] group relative md:rounded-3xl rounded-2xl overflow-hidden bg-white shadow-lg transition-all hover:translate-y-[-4px]"
                 >
                   <div className="md:aspect-video aspect-[3/4] relative">
                     <img
-                      src={getImageUrl(ad.photo) || '/images/restaurant-placeholder.jpg'}
+                      src={getImageUrl(ad.photo || ad.restaurant_cover) || '/images/restaurant-placeholder.jpg'}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       alt={ad.name}
                     />
