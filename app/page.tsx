@@ -51,6 +51,7 @@ export default function FastFoodPage() {
     selectedDistrict,
     setSelectedDistrict,
     districtRestaurants,
+    sponsoredRestaurants,
     loadMore,
     hasMore,
     isLocating,
@@ -153,6 +154,49 @@ export default function FastFoodPage() {
           />
         )}
       </section>
+
+      {/* Sponsored Restaurants Section */}
+      {sponsoredRestaurants && sponsoredRestaurants.length > 0 && !searchQuery && !selectedCategory && (
+        <section className="mt-8 bg-gradient-to-r from-orange-500/10 to-orange-500/5 py-8">
+          <div className="max-w-7xl mx-auto">
+            <div className="px-6 mb-6">
+              <h3 className="text-xl font-black text-gray-900 flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-orange-500" />
+                Patrocinados
+              </h3>
+            </div>
+
+            <div className="flex gap-6 overflow-x-auto no-scrollbar px-6 pb-4">
+              {sponsoredRestaurants.map((ad: any) => (
+                <Link
+                  key={`sponsored-${ad.id}`}
+                  href={ad.restaurant_slug ? `/${ad.restaurant_slug}` : `/restaurant/${ad.restaurant_id}`}
+                  className="flex-shrink-0 w-[240px] group relative rounded-3xl overflow-hidden bg-white shadow-lg transition-all hover:translate-y-[-4px]"
+                >
+                  <div className="aspect-video relative">
+                    <img
+                      src={getImageUrl(ad.photo) || '/images/restaurant-placeholder.jpg'}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      alt={ad.name}
+                    />
+                    <div className="absolute top-3 left-3">
+                      <div className="bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg shadow-sm border border-orange-100">
+                        <span className="text-[10px] font-black text-orange-600 uppercase tracking-widest">
+                          Ad
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <h4 className="font-black text-gray-900 line-clamp-1">{ad.name}</h4>
+                    <p className="text-xs text-gray-500 line-clamp-1 mt-1">{ad.description}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Featured Restaurants Row - Replacing Categories */}
       <section className="mt-4">

@@ -261,7 +261,16 @@ export interface TabUpdate {
   status?: 'open' | 'closed';
 }
 
+export interface RestaurantAd {
+  id: number;
+  name: string;
+  description: string;
+  photo: string;
+  restaurant_id: number;
+}
+
 export interface ExploreFeed {
   popular_restaurants: Restaurant[];
   new_restaurants: Restaurant[];
+  sponsored_restaurants: RestaurantAd[];
 }

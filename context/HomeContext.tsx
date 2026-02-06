@@ -24,6 +24,7 @@ interface HomeContextType {
     selectedDistrict: string;
     setSelectedDistrict: (district: string) => void;
     districtRestaurants: Restaurant[];
+    sponsoredRestaurants: any[];
     refreshData: () => Promise<void>;
     loadMore: () => Promise<void>;
     hasMore: boolean;
@@ -49,6 +50,7 @@ export function HomeProvider({ children }: { children: React.ReactNode }) {
     const [selectedProvince, setSelectedProvince] = useState('');
     const [selectedDistrict, setSelectedDistrict] = useState('');
     const [districtRestaurants, setDistrictRestaurants] = useState<Restaurant[]>([]);
+    const [sponsoredRestaurants, setSponsoredRestaurants] = useState<any[]>([]);
     const [isLocating, setIsLocating] = useState(false);
     const [hasLoadedInitially, setHasLoadedInitially] = useState(false);
     const [page, setPage] = useState(0);
@@ -233,11 +235,24 @@ export function HomeProvider({ children }: { children: React.ReactNode }) {
                     }
                 };
 
+                // Sponsored Section
+                const fetchSponsored = async () => {
+                    try {
+                        const feed = await fastfoodApi.getExploreFeed(selectedProvince || undefined);
+                        if (feed.sponsored_restaurants) {
+                            setSponsoredRestaurants(feed.sponsored_restaurants);
+                        }
+                    } catch (e) {
+                        console.error("Error fetching sponsored restaurants:", e);
+                    }
+                };
+
                 // Trigger all in parallel without blocking each other
                 fetchPopular();
                 fetchNew();
                 fetchPaged();
                 fetchDistrict();
+                fetchSponsored();
 
                 // Set overall loading to false once triggers are out
                 setLoading(false);
@@ -319,6 +334,7 @@ export function HomeProvider({ children }: { children: React.ReactNode }) {
             selectedDistrict,
             setSelectedDistrict,
             districtRestaurants,
+            sponsoredRestaurants,
             refreshData,
             loadMore,
             hasMore,
