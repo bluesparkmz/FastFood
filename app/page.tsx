@@ -166,28 +166,39 @@ export default function FastFoodPage() {
               </h3>
             </div>
 
-            <div className="flex gap-6 overflow-x-auto no-scrollbar px-6 pb-4">
+            <div className="flex md:gap-6 gap-4 overflow-x-auto no-scrollbar px-6 pb-4">
               {sponsoredRestaurants.map((ad: any) => (
                 <Link
                   key={`sponsored-${ad.id}`}
                   href={ad.restaurant_slug ? `/${ad.restaurant_slug}` : `/restaurant/${ad.restaurant_id}`}
-                  className="flex-shrink-0 w-[240px] group relative rounded-3xl overflow-hidden bg-white shadow-lg transition-all hover:translate-y-[-4px]"
+                  className="flex-shrink-0 md:w-[240px] w-[140px] group relative md:rounded-3xl rounded-2xl overflow-hidden bg-white shadow-lg transition-all hover:translate-y-[-4px]"
                 >
-                  <div className="aspect-video relative">
+                  <div className="md:aspect-video aspect-[3/4] relative">
                     <img
                       src={getImageUrl(ad.photo) || '/images/restaurant-placeholder.jpg'}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       alt={ad.name}
                     />
-                    <div className="absolute top-3 left-3">
+
+                    {/* Floating Ad Badge */}
+                    <div className="absolute top-3 left-3 z-10">
                       <div className="bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg shadow-sm border border-orange-100">
                         <span className="text-[10px] font-black text-orange-600 uppercase tracking-widest">
                           Ad
                         </span>
                       </div>
                     </div>
+
+                    {/* Mobile Text Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent md:hidden" />
+                    <div className="absolute bottom-0 left-0 right-0 p-3 md:hidden">
+                      <h4 className="font-black text-white text-[11px] line-clamp-1">{ad.name}</h4>
+                      <p className="text-[9px] text-white/80 line-clamp-1 mt-0.5 font-bold uppercase tracking-wider">{ad.description}</p>
+                    </div>
                   </div>
-                  <div className="p-4">
+
+                  {/* Desktop Bottom Info */}
+                  <div className="p-4 md:block hidden">
                     <h4 className="font-black text-gray-900 line-clamp-1">{ad.name}</h4>
                     <p className="text-xs text-gray-500 line-clamp-1 mt-1">{ad.description}</p>
                   </div>
