@@ -20,6 +20,7 @@ const BottomNav = () => {
 
     if (
         pathname?.startsWith('/restaurantes') ||
+        pathname?.startsWith('/share') ||
         pathname === '/help' ||
         pathname === '/privacy'
     ) {

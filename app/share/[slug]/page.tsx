@@ -23,26 +23,34 @@ type PageProps = {
   params: { slug: string };
 };
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const restaurant = await fetchRestaurantBySlug(params.slug);
+export async function generateMetadata(props: PageProps): Promise<Metadata> {
+  const params = await props.params;
+  const slug = params.slug;
+  const restaurant = await fetchRestaurantBySlug(slug);
 
   if (!restaurant) {
     return {
       title: 'Restaurante - FastFood SkyVenda',
       description: 'Peça online no FastFood SkyVenda.',
+      openGraph: {
+        title: 'Restaurante - FastFood SkyVenda',
+        description: 'Peça online no FastFood SkyVenda.',
+        url: `https://fastfood.skyvenda.com/share/${slug}`,
+        images: ['https://fastfood.skyvenda.com/images/fastfood-share-default.png'],
+      }
     };
   }
 
   const siteUrl = 'https://fastfood.skyvenda.com';
-  const targetUrl = `${siteUrl}/${restaurant.slug || params.slug}`;
+  const targetUrl = `${siteUrl}/${restaurant.slug || slug}`;
   const imageUrl = restaurant.cover_image
     ? (restaurant.cover_image.startsWith('http') ? restaurant.cover_image : `${base_url}/${restaurant.cover_image.replace(/^\//, '')}`)
     : `${siteUrl}/images/fastfood-share-default.png`;
 
   const title = `${restaurant.name} | FastFood SkyVenda`;
   const description = restaurant.neighborhood
-    ? `Peça agora em ${restaurant.name} (${restaurant.neighborhood}). Cardápio completo e entrega rápida via FastFood.`
-    : `Peça agora em ${restaurant.name} pelo FastFood. Cardápio completo e entrega rápida.`;
+    ? `Cardápio de ${restaurant.name} em ${restaurant.neighborhood}. Peça agora pelo FastFood SkyVenda.`
+    : `Veja o cardápio de ${restaurant.name} no FastFood SkyVenda e faça seu pedido online.`;
 
   return {
     title,
@@ -52,6 +60,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description,
       url: targetUrl,
       type: 'website',
+      siteName: 'FastFood SkyVenda',
       images: [{ url: imageUrl, width: 1200, height: 630, alt: restaurant.name }],
     },
     twitter: {
@@ -60,62 +69,44 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description,
       images: [imageUrl],
     },
+    alternates: {
+      canonical: targetUrl,
+    },
   };
 }
 
-export default async function ShareRestaurantPage({ params }: PageProps) {
-  const restaurant = await fetchRestaurantBySlug(params.slug);
-  const targetUrl = `/${restaurant?.slug || params.slug}`;
-  const fullTargetUrl = `https://fastfood.skyvenda.com${targetUrl}`;
+export default async function ShareRestaurantPage(props: PageProps) {
+  const params = await props.params;
+  const slug = params.slug;
+
+  // Buscar o restaurante para garantir que temos o slug correto para o redirect (caso usem ID no share)
+  const restaurant = await fetchRestaurantBySlug(slug);
+  const targetUrl = `/${restaurant?.slug || slug}`;
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 text-center">
-      <div className="max-w-md w-full animate-in fade-in zoom-in duration-500">
-        {/* Loading Spinner */}
-        <div className="relative w-24 h-24 mx-auto mb-8">
-          <div className="absolute inset-0 border-4 border-orange-100 rounded-full"></div>
-          <div className="absolute inset-0 border-4 border-orange-500 rounded-full border-t-transparent animate-spin"></div>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-2xl">🍕</span>
-          </div>
-        </div>
-
-        <h1 className="text-2xl font-black text-gray-900 mb-3">
-          {restaurant ? `Indo para ${restaurant.name}...` : 'Redirecionando...'}
-        </h1>
-
-        <p className="text-gray-500 mb-8 leading-relaxed">
-          Prepare o seu apetite! Estamos te levando para a página do restaurante para você fazer o seu pedido.
-        </p>
-
-        <a
-          href={targetUrl}
-          className="inline-flex items-center justify-center px-8 py-4 bg-orange-500 text-white font-bold rounded-2xl shadow-lg shadow-orange-200 hover:bg-orange-600 hover:scale-105 transition-all active:scale-95"
-        >
-          Entrar no Restaurante
-        </a>
-
-        <div className="mt-12 text-xs text-gray-400 font-medium tracking-widest uppercase">
-          FastFood SkyVenda MZ
-        </div>
-      </div>
-
-      {/* Script de Redirecionamento */}
+    <>
+      {/* Script de Redirecionamento Imediato no Cliente */}
       <script
         dangerouslySetInnerHTML={{
           __html: `
-            setTimeout(function() {
+            if (typeof window !== "undefined") {
+              // O replace não deixa a página de share no histórico do browser
               window.location.replace(${JSON.stringify(targetUrl)});
-            }, 500);
+            }
           `,
         }}
       />
 
-      {/* Meta Refresh Fallback */}
+      {/* Fallback de Redirecionamento 0s (SEO robots geralmente ignoram meta refresh de 0s) */}
       <noscript>
-        <meta httpEquiv="refresh" content={`2;url=${targetUrl}`} />
+        <meta httpEquiv="refresh" content={`0;url=${targetUrl}`} />
       </noscript>
-    </div>
+
+      {/* Página vazia como solicitado */}
+      <div style={{ display: 'none' }}>
+        Redirecionando para {restaurant?.name || 'restaurante'}...
+      </div>
+    </>
   );
 }
 

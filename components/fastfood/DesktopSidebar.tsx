@@ -21,6 +21,7 @@ const DesktopSidebar = () => {
 
     if (
         pathname?.startsWith('/restaurantes') ||
+        pathname?.startsWith('/share') ||
         pathname === '/help' ||
         pathname === '/privacy'
     ) {
