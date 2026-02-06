@@ -8,9 +8,9 @@ const SkeletonBase = ({ className }: { className?: string }) => (
 );
 
 export const CategorySkeleton = () => (
-    <div className="flex items-start gap-6 min-w-max px-6 py-8 overflow-x-auto no-scrollbar">
-        {[...Array(8)].map((_, i) => (
-            <div key={i} className="w-16 h-16 rounded-2xl bg-gray-200 animate-pulse flex-shrink-0" />
+    <div className="flex gap-6 overflow-x-auto no-scrollbar px-6 py-8">
+        {[...Array(4)].map((_, i) => (
+            <div key={i} className="flex-shrink-0 w-[300px] h-[350px] bg-gray-200 rounded-[2.5rem] animate-pulse" />
         ))}
     </div>
 );

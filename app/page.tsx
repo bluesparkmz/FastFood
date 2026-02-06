@@ -26,16 +26,7 @@ import {
 import { useHome } from '@/context/HomeContext';
 import { useAuth } from '@/context/AuthContext';
 
-const FOOD_CATEGORIES = [
-  { name: 'Tudo', icon: '🍽️', slug: '' },
-  { name: 'Pizza', icon: '🍕', slug: 'Pizza' },
-  { name: 'Búrguer', icon: '🍔', slug: 'Burger' },
-  { name: 'Chinesa', icon: '🥡', slug: 'Chinese' },
-  { name: 'Sushi', icon: '🍣', slug: 'Sushi' },
-  { name: 'Italiana', icon: '🍝', slug: 'Italiana' },
-  { name: 'Frango', icon: '🍗', slug: 'Chicken' },
-  { name: 'Doces', icon: '🍩', slug: 'Dessert' },
-];
+// Removed FOOD_CATEGORIES - focusing on restaurant-centric featured row
 
 export default function FastFoodPage() {
   const router = useRouter();
@@ -163,33 +154,64 @@ export default function FastFoodPage() {
         )}
       </section>
 
-      {/* Modern Categories Grid */}
-      <section className="overflow-x-auto no-scrollbar">
-        {loading ? (
+      {/* Featured Restaurants Row - Replacing Categories */}
+      <section className="mt-4">
+        {loading || loadingPopular ? (
           <CategorySkeleton />
         ) : (
-          <div className="flex items-start gap-6 min-w-max px-6 py-8">
-            {FOOD_CATEGORIES.map((cat) => (
-              <button
-                key={cat.name}
-                onClick={() => setSelectedCategory(cat.slug)}
-                className="flex flex-col items-center gap-3 group"
+          <div className="flex gap-6 overflow-x-auto no-scrollbar px-6 py-4">
+            {restaurants && restaurants.slice(0, 5).map((res: Restaurant) => (
+              <Link
+                key={`featured-${res.id}`}
+                href={`/${res.slug}`}
+                className="flex-shrink-0 w-[300px] group relative rounded-[2.5rem] overflow-hidden bg-white shadow-xl shadow-orange-100/50 border border-orange-50/50 transition-all hover:scale-[1.02]"
               >
-                <div className={cn(
-                  "w-16 h-16 rounded-2xl flex items-center justify-center text-2xl transition-all duration-300 shadow-sm",
-                  selectedCategory === cat.slug
-                    ? "bg-orange-500 text-white scale-110 shadow-lg shadow-orange-200"
-                    : "bg-white text-gray-400 group-hover:bg-gray-100 group-hover:text-gray-900"
-                )}>
-                  {cat.icon}
+                <div className="aspect-[4/5] relative">
+                  <img
+                    src={getImageUrl(res.cover_image) || '/images/restaurant-placeholder.jpg'}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    alt={res.name}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+
+                  <div className="absolute bottom-0 left-0 right-0 p-8">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="bg-orange-500 px-3 py-1 rounded-full flex items-center gap-1">
+                        <Star className="w-3 h-3 text-white fill-white" />
+                        <span className="text-[10px] font-black text-white">{(Number(res.rating) || 0).toFixed(1)}</span>
+                      </div>
+                      <span className="text-[10px] font-black text-white/80 uppercase tracking-widest">
+                        {res.category || 'Destaque'}
+                      </span>
+                    </div>
+
+                    <h3 className="text-2xl font-black text-white mb-2 leading-tight">
+                      {res.name}
+                    </h3>
+
+                    <div className="flex items-center justify-between mt-4 pb-2 border-b border-white/10">
+                      <div className="flex items-center gap-2">
+                        <Navigation className="w-3 h-3 text-orange-400" />
+                        <span className="text-[10px] font-bold text-white/70 uppercase tracking-wider truncate max-w-[120px]">
+                          {res.neighborhood || res.province}
+                        </span>
+                      </div>
+                      <span className="text-[10px] font-black text-orange-400 uppercase tracking-widest">
+                        PROMO
+                      </span>
+                    </div>
+
+                    <div className="mt-4 flex items-center justify-between">
+                      <p className="text-[10px] font-bold text-white/60">
+                        {res.min_delivery_value ? `${Number(res.min_delivery_value).toFixed(0)} MT mín.` : 'Sem mínimo'}
+                      </p>
+                      <div className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center group-hover:bg-orange-500 transition-colors">
+                        <TrendingUp className="w-4 h-4 text-white" />
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <span className={cn(
-                  "text-[10px] font-black uppercase tracking-widest transition-colors",
-                  selectedCategory === cat.slug ? "text-orange-600" : "text-gray-400"
-                )}>
-                  {cat.name}
-                </span>
-              </button>
+              </Link>
             ))}
           </div>
         )}
@@ -200,51 +222,7 @@ export default function FastFoodPage() {
 
 
 
-        {/* Popular / Suggested Restaurants Section */}
-        {!searchQuery && !selectedCategory && (loadingPopular || (restaurants && restaurants.length > 0)) && (
-          loadingPopular ? (
-            <SuggestedSkeleton />
-          ) : (
-            <section className="mb-12">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-black text-gray-900 flex items-center gap-2">
-                  <ShieldCheck className="w-5 h-5 text-orange-500" />
-                  Sugeridos para Si
-                </h3>
-                <Link href="/suggested" className="text-[10px] font-black text-orange-600 uppercase tracking-widest hover:text-orange-700 transition-colors">
-                  Ver mais
-                </Link>
-              </div>
-              <div className="flex gap-4 overflow-x-auto hide-scrollbar -mx-4 px-4 pb-4">
-                {restaurants.map((res: Restaurant) => (
-                  <Link
-                    key={`sug-res-${res.id}`}
-                    href={`/${res.slug}`}
-                    className="flex-shrink-0 w-72 bg-white rounded-[2rem] p-3 border border-gray-100 shadow-sm hover:shadow-md transition-all group"
-                  >
-                    <div className="relative aspect-[16/10] rounded-2xl overflow-hidden mb-3 bg-gray-100">
-                      <img
-                        src={getImageUrl(res.cover_image) || '/images/restaurant-placeholder.jpg'}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-2 py-1 rounded-lg flex items-center gap-1 shadow-sm">
-                        <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
-                        <span className="text-[10px] font-black text-gray-900">{(Number(res.rating) || 0).toFixed(1)}</span>
-                      </div>
-                    </div>
-                    <div className="px-1">
-                      <h4 className="font-black text-gray-900 truncate text-base">{res.name}</h4>
-                      <div className="flex items-center justify-between mt-1">
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{res.category || 'Restaurante'}</p>
-                        <p className="text-[10px] font-black text-orange-600">{(Number(res.min_delivery_value) || 0).toFixed(0)} MT mín.</p>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </section>
-          )
-        )}
+        {/* Redundant Sugeridos Section removed - now covered by Em Destaque section above */}
 
         {/* New Restaurants Section */}
         {!searchQuery && !selectedCategory && (loadingNew || (exploreData?.new_restaurants && exploreData?.new_restaurants?.length > 0)) && (
