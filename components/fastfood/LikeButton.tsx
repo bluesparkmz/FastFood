@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { Heart } from 'lucide-react';
 import { fastfoodApi } from '@/api/fastfoodApi';
 import { toast } from 'sonner';
+import { useAuth } from '@/context/AuthContext';
+import AuthModal from './AuthModal';
 
 interface LikeButtonProps {
     restaurantId: number;
@@ -20,13 +22,20 @@ export default function LikeButton({
     size = 'md',
     showCount = true
 }: LikeButtonProps) {
+    const { isLoggedIn } = useAuth();
     const [liked, setLiked] = useState(initialLiked ?? false);
     const [likes, setLikes] = useState(initialLikes);
     const [isLoading, setIsLoading] = useState(false);
+    const [showAuthModal, setShowAuthModal] = useState(false);
 
     const handleLike = async (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
+
+        if (!isLoggedIn) {
+            setShowAuthModal(true);
+            return;
+        }
 
         if (isLoading) return;
 
@@ -52,7 +61,7 @@ export default function LikeButton({
             setLikes(previousLikes);
 
             if (error.response?.status === 401) {
-                toast.error('Faça login para dar like');
+                setShowAuthModal(true);
             } else {
                 toast.error('Erro ao processar like');
             }
@@ -101,6 +110,13 @@ export default function LikeButton({
                     {likes}
                 </span>
             )}
+
+            <AuthModal
+                isOpen={showAuthModal}
+                onClose={() => setShowAuthModal(false)}
+                title="Curta para salvar"
+                description="Faça login para salvar seus restaurantes favoritos e recebê-los primeiro."
+            />
         </button>
     );
 }
