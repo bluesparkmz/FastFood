@@ -375,12 +375,12 @@ export default function RestaurantDetailPage() {
           <motion.div
             key="restaurant-hero"
             initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 300, opacity: 1 }}
+            animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 240, damping: 30 }}
             className="relative w-full overflow-hidden"
           >
-            <div className="relative w-full h-[300px] overflow-hidden">
+            <div className="relative w-full h-[300px] md:h-[500px] lg:h-[600px] overflow-hidden">
               {activeHeroImage ? (
                 <AnimatePresence mode="wait">
                   <motion.div
