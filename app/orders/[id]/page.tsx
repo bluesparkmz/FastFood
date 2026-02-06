@@ -169,16 +169,16 @@ export default function OrderDetailsPage() {
     return (
         <div className="min-h-screen bg-gray-50 pb-20 font-sans">
             {/* Header */}
-            <div className="bg-white/80 backdrop-blur-md sticky top-0 z-20 border-b border-gray-100">
-                <div className="max-w-3xl mx-auto px-4 py-4 flex items-center gap-4">
+            <div className="bg-white/80 backdrop-blur-md sticky top-0 z-20 border-b border-gray-100 px-4 py-4">
+                <div className="max-w-5xl mx-auto w-full flex items-center gap-4">
                     <button
                         onClick={() => router.back()}
-                        className="p-2 hover:bg-gray-100 rounded-full transition-colors active:scale-95"
+                        className="p-2 hover:bg-gray-100 rounded-full transition-colors active:scale-95 md:hidden"
                     >
                         <ArrowLeft className="w-6 h-6 text-gray-800" />
                     </button>
                     <div>
-                        <h1 className="text-xl font-black text-gray-900">Pedido #{order.id}</h1>
+                        <h1 className="text-xl md:text-2xl font-black text-gray-900">Pedido #{order.id}</h1>
                         <p className="text-sm text-gray-500 font-medium">
                             {new Date(order.created_at).toLocaleDateString('pt-MZ', {
                                 day: '2-digit', month: 'long', hour: '2-digit', minute: '2-digit'

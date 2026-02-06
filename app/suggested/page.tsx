@@ -16,15 +16,16 @@ export default function SuggestedPage() {
 
     return (
         <div className="min-h-screen bg-gray-50 pb-24">
-            {/* Mini Header */}
-            <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100 px-6 py-4 flex items-center gap-4">
-                <button
-                    onClick={() => router.back()}
-                    className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-900 active:scale-95 transition-all"
-                >
-                    <ArrowLeft className="w-5 h-5" />
-                </button>
-                <h1 className="text-lg font-black text-gray-900 tracking-tight">Sugeridos</h1>
+            <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100 px-6 py-4">
+                <div className="max-w-7xl mx-auto w-full flex items-center gap-4">
+                    <button
+                        onClick={() => router.back()}
+                        className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-900 active:scale-95 transition-all md:hidden"
+                    >
+                        <ArrowLeft className="w-5 h-5" />
+                    </button>
+                    <h1 className="text-lg md:text-2xl font-black text-gray-900 tracking-tight">Sugeridos</h1>
+                </div>
             </header>
 
             <main className="max-w-7xl mx-auto px-4 py-8">

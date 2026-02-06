@@ -134,21 +134,23 @@ export default function NearbyRestaurantsPage() {
           isScrolled ? "bg-white/80 backdrop-blur-xl border-b border-gray-100 shadow-sm" : "bg-white"
         )}
       >
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => router.back()}
-            className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
-          <h1 className="text-lg font-black tracking-tight text-gray-900">
-            Perto de <span className="text-orange-600">Mim</span>
-          </h1>
-        </div>
+        <div className="max-w-7xl mx-auto w-full flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => router.back()}
+              className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors md:hidden"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            <h1 className="text-lg md:text-2xl font-black tracking-tight text-gray-900">
+              Perto de <span className="text-orange-600">Mim</span>
+            </h1>
+          </div>
 
-        <button className="p-2 rounded-xl bg-gray-50 text-gray-400">
-          <Settings className="w-5 h-5" />
-        </button>
+          <button className="p-2 rounded-xl bg-gray-50 text-gray-400">
+            <Settings className="w-5 h-5" />
+          </button>
+        </div>
       </header>
 
       {/* Hero / Control Section */}

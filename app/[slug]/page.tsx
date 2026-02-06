@@ -408,7 +408,7 @@ export default function RestaurantDetailPage() {
               <div className="absolute top-0 left-0 w-full px-6 py-4 flex items-center justify-between z-20">
                 <button
                   onClick={() => router.back()}
-                  className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/30 transition-all border border-white/20"
+                  className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/30 transition-all border border-white/20 md:hidden"
                 >
                   <ChevronLeft className="w-6 h-6" />
                 </button>

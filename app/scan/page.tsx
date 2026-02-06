@@ -121,15 +121,17 @@ export default function QRScannerPage() {
     return (
         <div className="min-h-screen bg-black text-white flex flex-col">
             {/* Header Overlay */}
-            <div className="absolute top-0 left-0 w-full z-10 px-6 py-8 flex items-center justify-between bg-gradient-to-b from-black/80 to-transparent">
-                <button
-                    onClick={() => router.back()}
-                    className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 hover:bg-white/20 transition-all z-20"
-                >
-                    <ArrowLeft className="w-6 h-6 text-white" />
-                </button>
-                <span className="font-black uppercase tracking-[0.2em] text-[10px] text-white/60">Escanear QR Code</span>
-                <div className="w-12 h-12" /> {/* Spacer */}
+            <div className="absolute top-0 left-0 w-full z-10 px-6 py-8 bg-gradient-to-b from-black/80 to-transparent">
+                <div className="max-w-7xl mx-auto w-full flex items-center justify-between">
+                    <button
+                        onClick={() => router.back()}
+                        className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 hover:bg-white/20 transition-all z-20 md:hidden"
+                    >
+                        <ArrowLeft className="w-6 h-6 text-white" />
+                    </button>
+                    <span className="font-black uppercase tracking-[0.2em] text-[10px] md:text-xs text-white/60">Escanear QR Code</span>
+                    <div className="w-12 h-12 md:hidden" /> {/* Spacer only for mobile centering */}
+                </div>
             </div>
 
             {/* Scanner Viewport */}

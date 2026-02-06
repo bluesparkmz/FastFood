@@ -27,7 +27,7 @@ export default function OrdersPage() {
     const handleOrderUpdate = (event: any) => {
       const data = event.detail;
       console.log("Received order update, refreshing...", data);
-      
+
       // Refresh orders list
       fetchOrders();
     };
@@ -36,9 +36,9 @@ export default function OrdersPage() {
       const data = event.detail;
       const orderId = data.order_id || data.data?.reference_id || data.data?.order_id;
       const newStatus = data.new_status || data.data?.notification_type?.replace('order_', '');
-      
+
       console.log("Received order status update", { orderId, newStatus });
-      
+
       // Update the order in the list if we have the data
       if (orderId && newStatus) {
         setOrders(prevOrders => {
@@ -97,15 +97,15 @@ export default function OrdersPage() {
     <div className="min-h-screen bg-gray-50 pb-20 font-sans">
       {/* Standardized Header */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100 px-4 py-3">
-        <div className="max-w-3xl mx-auto flex items-center justify-between">
+        <div className="max-w-3xl md:max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.back()}
-              className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
+              className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors md:hidden"
             >
               <ChevronLeft className="w-6 h-6" />
             </button>
-            <h1 className="text-lg font-black tracking-tight text-gray-900">
+            <h1 className="text-lg md:text-2xl font-black tracking-tight text-gray-900">
               Meus <span className="text-orange-600">Pedidos</span>
             </h1>
           </div>
@@ -122,7 +122,7 @@ export default function OrdersPage() {
       </header>
 
       {/* Orders List / Login Prompt */}
-      <div className="max-w-3xl mx-auto px-4">
+      <div className="max-w-3xl md:max-w-5xl mx-auto px-4">
         {authLoading || loading ? (
           <div className="space-y-6">
             {[...Array(3)].map((_, i) => (

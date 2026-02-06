@@ -110,10 +110,12 @@ export default function ProfilePage() {
     return (
         <div className="min-h-screen bg-gray-50 pb-20">
             <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-gray-100 px-6 py-4">
-                <h1 className="text-lg font-black tracking-tight text-gray-900">Perfil</h1>
+                <div className="max-w-4xl mx-auto">
+                    <h1 className="text-lg md:text-2xl font-black tracking-tight text-gray-900">Perfil</h1>
+                </div>
             </header>
 
-            <div className="max-w-md mx-auto px-4 py-6 space-y-6">
+            <div className="max-w-md md:max-w-4xl mx-auto px-4 py-6 space-y-6">
                 <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
                     <div className="p-6 flex items-center gap-4">
                         <div className="w-14 h-14 rounded-2xl bg-orange-500 flex items-center justify-center text-white shadow-lg shadow-orange-200">

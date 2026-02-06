@@ -98,15 +98,15 @@ export default function NotificationsPage() {
   return (
     <div className="min-h-screen bg-gray-50 pb-20 font-sans">
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100 px-4 py-3">
-        <div className="max-w-3xl mx-auto flex items-center justify-between">
+        <div className="max-w-3xl md:max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.back()}
-              className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
+              className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors md:hidden"
             >
               <ChevronLeft className="w-6 h-6" />
             </button>
-            <h1 className="text-lg font-black tracking-tight text-gray-900 flex items-center gap-2">
+            <h1 className="text-lg md:text-2xl font-black tracking-tight text-gray-900 flex items-center gap-2">
               <Bell className="w-5 h-5 text-orange-500" />
               Notificações
             </h1>
@@ -114,7 +114,7 @@ export default function NotificationsPage() {
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+      <main className="max-w-3xl md:max-w-5xl mx-auto px-4 py-6 space-y-6">
         {!isLoggedIn && (
           <div className="bg-yellow-50 border border-yellow-100 rounded-2xl p-4 text-sm text-yellow-800">
             Entre para receber notificações personalizadas dos seus pedidos FastFood.

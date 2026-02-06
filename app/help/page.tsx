@@ -31,14 +31,14 @@ export default function HelpPage() {
         <main className="min-h-screen bg-gray-50 pb-20">
             {/* Header */}
             <header className="bg-white sticky top-0 z-50 border-b border-gray-100">
-                <div className="max-w-4xl mx-auto px-4 h-16 flex items-center gap-4">
+                <div className="max-w-7xl mx-auto px-4 h-16 flex items-center gap-4">
                     <Link
                         href="/"
-                        className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center hover:bg-gray-100 transition-colors"
+                        className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center hover:bg-gray-100 transition-colors md:hidden"
                     >
                         <ArrowLeft className="w-5 h-5 text-gray-700" />
                     </Link>
-                    <h1 className="text-lg font-bold text-gray-900">Ajuda e Suporte</h1>
+                    <h1 className="text-lg md:text-2xl font-black text-gray-900">Ajuda e Suporte</h1>
                 </div>
             </header>
 

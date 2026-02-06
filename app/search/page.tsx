@@ -48,16 +48,16 @@ export default function SearchPage() {
         <div className="min-h-screen bg-white pb-24">
             {/* Search Header */}
             <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100 px-4 py-3">
-                <div className="max-w-2xl mx-auto space-y-3">
+                <div className="max-w-2xl md:max-w-4xl mx-auto space-y-3">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                             <button
                                 onClick={() => router.back()}
-                                className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
+                                className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors md:hidden"
                             >
                                 <ChevronLeft className="w-6 h-6" />
                             </button>
-                            <h1 className="text-lg font-black tracking-tight text-gray-900">
+                            <h1 className="text-lg md:text-2xl font-black tracking-tight text-gray-900">
                                 Pesquisar <span className="text-orange-600">Comida</span>
                             </h1>
                         </div>
@@ -95,7 +95,7 @@ export default function SearchPage() {
                 </div>
             </header>
 
-            <main className="px-4 py-6 max-w-2xl mx-auto">
+            <main className="px-4 py-6 max-w-2xl md:max-w-4xl mx-auto">
                 {!isSearching ? (
                     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                         {/* Recent/Popular searches */}
