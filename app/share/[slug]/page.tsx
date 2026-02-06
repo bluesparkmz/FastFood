@@ -1,15 +1,19 @@
 import type { Metadata } from 'next';
 import type { Restaurant } from '@/types/fastfood';
 import { base_url } from '@/api/api';
+import { getImageUrl } from '@/utils/imageUtils';
 
 async function fetchRestaurantBySlug(slug: string): Promise<Restaurant | null> {
   try {
-    // Usar encodeURIComponent para garantir que o slug seja tratado corretamente na URL
-    const res = await fetch(`${base_url}/fastfood/restaurants/s/${encodeURIComponent(slug)}`, {
-      next: { revalidate: 300 }, // Cache de 5 minutos para SEO
+    const url = `${base_url}/fastfood/restaurants/s/${encodeURIComponent(slug)}`;
+    console.log('Fetching restaurant for share:', url);
+
+    const res = await fetch(url, {
+      next: { revalidate: 300 },
     });
 
     if (!res.ok) {
+      console.error('Fetch failed for restaurant share:', res.status, res.statusText);
       return null;
     }
     return await res.json() as Restaurant;
@@ -20,13 +24,14 @@ async function fetchRestaurantBySlug(slug: string): Promise<Restaurant | null> {
 }
 
 type PageProps = {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 };
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
-  const params = await props.params;
-  const slug = params.slug;
+  const { slug } = await props.params;
   const restaurant = await fetchRestaurantBySlug(slug);
+
+  const siteUrl = 'https://fastfood.skyvenda.com';
 
   if (!restaurant) {
     return {
@@ -35,17 +40,14 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
       openGraph: {
         title: 'Restaurante - FastFood SkyVenda',
         description: 'Peça online no FastFood SkyVenda.',
-        url: `https://fastfood.skyvenda.com/share/${slug}`,
-        images: ['https://fastfood.skyvenda.com/images/fastfood-share-default.png'],
+        url: `${siteUrl}/share/${slug}`,
+        images: [`${siteUrl}/images/fastfood-share-default.png`],
       }
     };
   }
 
-  const siteUrl = 'https://fastfood.skyvenda.com';
   const targetUrl = `${siteUrl}/${restaurant.slug || slug}`;
-  const imageUrl = restaurant.cover_image
-    ? (restaurant.cover_image.startsWith('http') ? restaurant.cover_image : `${base_url}/${restaurant.cover_image.replace(/^\//, '')}`)
-    : `${siteUrl}/images/fastfood-share-default.png`;
+  const imageUrl = getImageUrl(restaurant.cover_image) || `${siteUrl}/images/fastfood-share-default.png`;
 
   const title = `${restaurant.name} | FastFood SkyVenda`;
   const description = restaurant.neighborhood
